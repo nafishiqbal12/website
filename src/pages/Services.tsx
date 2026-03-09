@@ -7,9 +7,33 @@ import {
   CheckCircle2,
   ArrowRight,
 } from 'lucide-react';
+import type { MouseEvent } from 'react';
 
 interface ServicesProps {
   onNavigate: (page: string) => void;
+}
+
+interface ContactLinkProps {
+  onNavigate: (page: string) => void;
+  label: string;
+  className: string;
+  ariaLabel: string;
+}
+
+function ContactLink({ onNavigate, label, className, ariaLabel }: ContactLinkProps) {
+  return (
+    <a
+      href="/contact"
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();
+        onNavigate('contact');
+      }}
+      className={className}
+      aria-label={ariaLabel}
+    >
+      {label}
+    </a>
+  );
 }
 
 const services = [
@@ -78,26 +102,26 @@ export default function Services({ onNavigate }: ServicesProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm uppercase tracking-[0.25em] text-blue-100 mb-4">BlockWaveLab Services</p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6">
-            Crypto Marketing Services Built for Real Growth
+            Crypto Marketing Agency Services for Web3 Growth
           </h1>
           <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto mb-10">
-            We help Web3 teams launch faster, grow stronger communities, and earn visibility through creator partnerships and strategic media coverage.
+            We help Web3 teams launch faster, grow stronger communities, and earn visibility through crypto KOL marketing, web3 influencer marketing, and strategic media coverage.
           </p>
-          <button
-            onClick={() => onNavigate('contact')}
-            className="inline-flex items-center gap-2 bg-white text-blue-700 px-7 py-3 rounded-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all"
-            aria-label="Contact BlockWaveLab"
-          >
-            <span>Contact Us</span>
-            <ArrowRight size={18} />
-          </button>
+          <div className="flex items-center justify-center">
+            <ContactLink
+              onNavigate={onNavigate}
+              label="Contact Us"
+              className="inline-flex items-center gap-2 bg-white text-blue-700 px-7 py-3 rounded-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all"
+              ariaLabel="Contact BlockWaveLab"
+            />
+          </div>
         </div>
       </section>
 
       <section className="py-20 bg-white" aria-label="Services grid">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">What We Offer</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Crypto KOL Marketing & Web3 Influencer Marketing Services</h2>
             <p className="text-lg text-gray-600">
               End-to-end crypto marketing services designed to help your project stand out in a competitive Web3 market.
             </p>
@@ -114,6 +138,14 @@ export default function Services({ onNavigate }: ServicesProps) {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
                 <p className="text-gray-700 leading-relaxed">{service.description}</p>
+                <div className="mt-5">
+                  <ContactLink
+                    onNavigate={onNavigate}
+                    label="Talk to our team"
+                    className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-cyan-500 transition-colors"
+                    ariaLabel={`Talk to BlockWaveLab about ${service.title}`}
+                  />
+                </div>
               </article>
             ))}
           </div>
@@ -157,14 +189,27 @@ export default function Services({ onNavigate }: ServicesProps) {
           <p className="text-lg sm:text-xl text-gray-300 mb-9">
             Book a strategy call and get a practical growth plan tailored to your token, audience, and launch timeline.
           </p>
-          <button
-            onClick={() => onNavigate('contact')}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
-            aria-label="Go to contact page"
-          >
-            <span>Get In Touch</span>
-            <ArrowRight size={20} />
-          </button>
+          <div className="flex items-center justify-center">
+            <ContactLink
+              onNavigate={onNavigate}
+              label="Get In Touch"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
+              ariaLabel="Go to contact page"
+            />
+          </div>
+          <div className="mt-4 text-sm text-gray-400">
+            <a
+              href="/contact"
+              onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                event.preventDefault();
+                onNavigate('contact');
+              }}
+              className="hover:text-cyan-400 transition-colors inline-flex items-center gap-2"
+            >
+              <span>Prefer email or Telegram? Visit our contact page</span>
+              <ArrowRight size={16} />
+            </a>
+          </div>
         </div>
       </section>
     </div>

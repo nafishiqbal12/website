@@ -1,10 +1,16 @@
 import { TrendingUp, Users, Eye, ArrowRight } from 'lucide-react';
+import type { MouseEvent } from 'react';
 
 interface CaseStudiesProps {
   onNavigate: (page: string) => void;
 }
 
 export default function CaseStudies({ onNavigate }: CaseStudiesProps) {
+  const handleNav = (event: MouseEvent<HTMLAnchorElement>, page: string) => {
+    event.preventDefault();
+    onNavigate(page);
+  };
+
   const cases = [
     {
       title: 'MEXC Listing Campaign',
@@ -188,6 +194,12 @@ export default function CaseStudies({ onNavigate }: CaseStudiesProps) {
                 <div className="text-blue-100">Success Rate</div>
               </div>
             </div>
+
+            <div className="mt-10 flex flex-wrap justify-center gap-3 text-sm">
+              <a href="/services" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'services')} className="px-4 py-2 rounded-lg bg-white/15 border border-white/20 hover:bg-white/25 transition-colors">Explore Services</a>
+              <a href="/blog" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'blog')} className="px-4 py-2 rounded-lg bg-white/15 border border-white/20 hover:bg-white/25 transition-colors">Read Blog Insights</a>
+              <a href="/about" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'about')} className="px-4 py-2 rounded-lg bg-white/15 border border-white/20 hover:bg-white/25 transition-colors">About BlockWaveLab</a>
+            </div>
           </div>
         </div>
       </section>
@@ -198,13 +210,14 @@ export default function CaseStudies({ onNavigate }: CaseStudiesProps) {
           <p className="text-xl text-gray-300 mb-8">
             Let's discuss how we can craft a winning campaign for your crypto project.
           </p>
-          <button
-            onClick={() => onNavigate('contact')}
+          <a
+            href="/contact"
+            onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'contact')}
             className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center space-x-2"
           >
             <span>Start Your Campaign</span>
             <ArrowRight size={20} />
-          </button>
+          </a>
         </div>
       </section>
     </div>

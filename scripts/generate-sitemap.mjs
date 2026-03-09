@@ -8,19 +8,16 @@ const pagesDir = path.join(workspaceRoot, 'src', 'pages');
 // Required marketing URLs that may not always map 1:1 to page filenames.
 const requiredPaths = [
   '/',
-  '/about',
   '/services',
-  '/kol-marketing',
-  '/crypto-marketing',
-  '/web3-marketing',
-  '/cases',
+  '/about',
   '/contact',
   '/blog',
+  '/case-studies',
 ];
 
 const explicitPageMap = {
   Home: '/',
-  CaseStudies: '/cases',
+  CaseStudies: '/case-studies',
 };
 
 const ignoredPageNames = new Set(['BlogPost']);
@@ -80,15 +77,6 @@ function main() {
 
   const publicSitemapPath = path.join(workspaceRoot, 'public', 'sitemap.xml');
   writeFile(publicSitemapPath, sitemapXml);
-
-  const rootSitemapPath = path.join(workspaceRoot, 'sitemap.xml');
-  writeFile(rootSitemapPath, sitemapXml);
-
-  const distDir = path.join(workspaceRoot, 'dist');
-  if (fs.existsSync(distDir)) {
-    const distSitemapPath = path.join(distDir, 'sitemap.xml');
-    writeFile(distSitemapPath, sitemapXml);
-  }
 
   console.log(`Sitemap generated with ${allPaths.length} URLs.`);
 }

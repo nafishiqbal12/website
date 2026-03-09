@@ -1,4 +1,5 @@
-import { TrendingUp, Users, Newspaper, Star, ArrowRight, CheckCircle, Send } from 'lucide-react';
+import { TrendingUp, Users, Newspaper, ArrowRight, CheckCircle, Send } from 'lucide-react';
+import type { MouseEvent } from 'react';
 import ExchangeMarquee from '../components/ExchangeMarquee';
 
 interface HomeProps {
@@ -6,6 +7,11 @@ interface HomeProps {
 }
 
 export default function Home({ onNavigate }: HomeProps) {
+  const handleNav = (event: MouseEvent<HTMLAnchorElement>, page: string) => {
+    event.preventDefault();
+    onNavigate(page);
+  };
+
   const services = [
     {
       icon: <TrendingUp size={32} />,
@@ -81,6 +87,24 @@ export default function Home({ onNavigate }: HomeProps) {
 
   const partners = [
     'Binance', 'MEXC', 'Gate.io', 'KuCoin', 'Bybit', 'Cointelegraph'
+  ];
+
+  const clientLogos = [
+    'ApexChain',
+    'NovaFi',
+    'MetaVault',
+    'BlockGrid',
+    'ChainSphere',
+    'OrbitDEX',
+  ];
+
+  const cryptoProjectLogos = [
+    'DeFiPulseX',
+    'ZeroLend',
+    'GameVerse3D',
+    'TokenForge',
+    'BridgeLayer',
+    'NFTFlow',
   ];
 
   const strategies = [
@@ -181,6 +205,66 @@ export default function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
 
+      <section className="py-16 bg-white" aria-label="Client logos">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Client Logos</h2>
+            <p className="text-gray-600">Trusted by ambitious Web3 teams across DeFi, gaming, and infrastructure.</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {clientLogos.map((client) => (
+              <div
+                key={client}
+                className="h-20 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white flex items-center justify-center text-gray-700 font-semibold"
+              >
+                {client}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-gray-50" aria-label="Partner networks">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Partner Networks</h2>
+            <p className="text-gray-600">Exchange, media, and ecosystem relationships that increase campaign reach.</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {partners.map((partner) => (
+              <div
+                key={partner}
+                className="h-20 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-700 font-semibold"
+              >
+                {partner}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-white" aria-label="Crypto project logos">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Crypto Project Logos</h2>
+            <p className="text-gray-600">Campaigns delivered for launch-stage and scaling crypto projects.</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {cryptoProjectLogos.map((project) => (
+              <div
+                key={project}
+                className="h-20 rounded-xl border border-gray-200 bg-gradient-to-br from-cyan-50 to-blue-50 flex items-center justify-center text-gray-700 font-semibold"
+              >
+                {project}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-12 bg-[#0B0E14] border-y border-white/5" aria-label="Trusted partners">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
@@ -190,6 +274,20 @@ export default function Home({ onNavigate }: HomeProps) {
             </p>
           </div>
           <ExchangeMarquee />
+
+          <div className="mt-10 max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-6">
+            <h2 className="text-2xl font-bold text-white mb-3 text-center">Explore BlockWaveLab</h2>
+            <p className="text-gray-400 text-center mb-5">
+              Learn about our services, team, case studies, and latest Web3 growth insights.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 text-sm">
+              <a href="/services" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'services')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Services</a>
+              <a href="/about" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'about')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">About</a>
+              <a href="/contact" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'contact')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Contact</a>
+              <a href="/blog" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'blog')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Blog</a>
+              <a href="/case-studies" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'cases')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Case Studies</a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -306,7 +404,7 @@ export default function Home({ onNavigate }: HomeProps) {
       <section className="py-20 bg-gradient-to-br from-blue-600 to-cyan-500 text-white" aria-label="Campaign metrics">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Campaign Success Metrics</h2>
+            <h2 className="text-4xl font-bold mb-4">Campaign Results</h2>
             <p className="text-blue-100 text-lg">Proven results that drive real growth</p>
           </div>
 

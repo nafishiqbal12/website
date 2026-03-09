@@ -1,7 +1,31 @@
 import { Target, Briefcase, Workflow, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
+import type { MouseEvent, ReactNode } from 'react';
 
 interface AboutProps {
   onNavigate: (page: string) => void;
+}
+
+interface InternalLinkProps {
+  to: string;
+  page: string;
+  onNavigate: (page: string) => void;
+  className?: string;
+  children: ReactNode;
+}
+
+function InternalLink({ to, page, onNavigate, className, children }: InternalLinkProps) {
+  return (
+    <a
+      href={to}
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();
+        onNavigate(page);
+      }}
+      className={className}
+    >
+      {children}
+    </a>
+  );
 }
 
 export default function About({ onNavigate }: AboutProps) {
@@ -84,6 +108,20 @@ export default function About({ onNavigate }: AboutProps) {
             <p className="text-lg text-gray-600">
               We design and execute integrated marketing campaigns that help crypto startups, protocols, and ecosystems scale.
             </p>
+            <p className="text-base text-gray-700 mt-4">
+              Explore our
+              {' '}
+              <InternalLink
+                to="/services"
+                page="services"
+                onNavigate={onNavigate}
+                className="text-blue-600 font-semibold hover:text-cyan-500 transition-colors"
+              >
+                crypto marketing services
+              </InternalLink>
+              {' '}
+              to see how we support every stage of Web3 growth.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -99,13 +137,13 @@ export default function About({ onNavigate }: AboutProps) {
         </div>
       </section>
 
-      <section className="py-20 bg-white" aria-label="Our process">
+      <section className="py-20 bg-white" aria-label="Our Web3 marketing approach">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
             <div className="w-12 h-12 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center mb-4">
               <Workflow size={24} />
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Our Process</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Our Web3 Marketing Approach</h2>
             <p className="text-lg text-gray-600">A clear framework that keeps campaigns aligned with your business outcomes.</p>
           </div>
 
@@ -127,7 +165,7 @@ export default function About({ onNavigate }: AboutProps) {
             <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
               <ShieldCheck size={24} />
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why Choose Us</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why Choose BlockWaveLab</h2>
             <p className="text-lg text-gray-600">We combine crypto-native insight with performance-focused execution.</p>
           </div>
 
@@ -150,14 +188,29 @@ export default function About({ onNavigate }: AboutProps) {
           <p className="text-lg sm:text-xl text-gray-300 mb-9">
             Let us build a campaign strategy tailored to your token, audience, and launch goals.
           </p>
-          <button
-            onClick={() => onNavigate('contact')}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
-            aria-label="Go to contact page"
-          >
-            <span>Contact BlockWaveLab</span>
-            <ArrowRight size={20} />
-          </button>
+          <div className="flex items-center justify-center">
+            <InternalLink
+              to="/contact"
+              page="contact"
+              onNavigate={onNavigate}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
+            >
+              <span>Contact BlockWaveLab</span>
+              <ArrowRight size={20} />
+            </InternalLink>
+          </div>
+          <p className="mt-4 text-sm text-gray-400">
+            Prefer to review our offerings first?
+            {' '}
+            <InternalLink
+              to="/services"
+              page="services"
+              onNavigate={onNavigate}
+              className="text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              View Services
+            </InternalLink>
+          </p>
         </div>
       </section>
     </div>
