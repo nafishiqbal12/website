@@ -23,6 +23,15 @@ const explicitPageMap = {
   CaseStudies: '/cases',
 };
 
+const ignoredPageNames = new Set(['BlogPost']);
+
+// Keep in sync with src/content/blogPosts.ts slugs for dynamic /blog/[slug] routes.
+const blogPostSlugs = [
+  'crypto-kol-marketing-playbook',
+  'token-launch-marketing-checklist',
+  'web3-community-growth-strategies',
+];
+
 function toKebabCase(value) {
   return value
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
@@ -40,6 +49,7 @@ function discoverPagePaths() {
   return files
     .filter((file) => file.endsWith('.tsx'))
     .map((file) => path.parse(file).name)
+    .filter((name) => !ignoredPageNames.has(name))
     .map((name) => explicitPageMap[name] ?? `/${toKebabCase(name)}`)
     .filter(Boolean);
 }
@@ -64,7 +74,8 @@ function writeFile(targetPath, content) {
 
 function main() {
   const discoveredPaths = discoverPagePaths();
-  const allPaths = [...new Set([...requiredPaths, ...discoveredPaths])].sort();
+  const blogPostPaths = blogPostSlugs.map((slug) => `/blog/${slug}`);
+  const allPaths = [...new Set([...requiredPaths, ...discoveredPaths, ...blogPostPaths])].sort();
   const sitemapXml = buildSitemapXml(allPaths);
 
   const publicSitemapPath = path.join(workspaceRoot, 'public', 'sitemap.xml');

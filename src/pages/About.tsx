@@ -1,171 +1,142 @@
-import { Target, Eye, Shield, Zap } from 'lucide-react';
+import { Target, Briefcase, Workflow, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-export default function About() {
-  const team = [
+interface AboutProps {
+  onNavigate: (page: string) => void;
+}
+
+export default function About({ onNavigate }: AboutProps) {
+  const offerings = [
+    'Crypto KOL marketing campaigns',
+    'Web3 influencer partnerships',
+    'Community growth across Telegram, Discord, and X',
+    'PR and media coverage in crypto publications',
+  ];
+
+  const processSteps = [
     {
-      name: 'Nafish Iqbal',
-      role: 'Founder & CEO',
-      image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400',
+      title: 'Discover',
+      description:
+        'We audit your brand, token narrative, audience profile, and growth goals to define the right campaign direction.',
     },
     {
-      name: 'Maya Patel',
-      role: 'Head of KOL Relations',
-      image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
+      title: 'Plan',
+      description:
+        'We build a practical strategy covering KOL selection, influencer content flow, community activations, and PR angle.',
     },
     {
-      name: 'James Chen',
-      role: 'Strategy Director',
-      image: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=400',
+      title: 'Execute',
+      description:
+        'Our team launches and manages campaigns end-to-end, coordinating creators, content timing, and channel performance.',
     },
     {
-      name: 'Sophie Anderson',
-      role: 'Community Manager',
-      image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=400',
+      title: 'Optimize',
+      description:
+        'We continuously refine based on engagement and conversion data to improve outcomes and scale what works.',
     },
   ];
 
-  const values = [
-    {
-      icon: <Shield size={32} />,
-      title: 'Transparency',
-      description: 'We believe in honest communication and clear reporting. Every campaign is backed by real data and measurable results.',
-    },
-    {
-      icon: <Zap size={32} />,
-      title: 'Creativity',
-      description: 'Innovation drives us. We craft unique campaigns that stand out in the crowded crypto space and capture attention.',
-    },
-    {
-      icon: <Target size={32} />,
-      title: 'Results',
-      description: 'We are obsessed with delivering outcomes. Your success metrics are our success metrics, and we optimize relentlessly.',
-    },
-  ];
-
-  const partners = [
-    'Binance', 'MEXC', 'Gate.io', 'KuCoin', 'Bybit', 'OKX',
-    'Huobi', 'Bitget', 'Crypto.com', 'Coinbase'
+  const reasons = [
+    'Crypto-native team with hands-on Web3 campaign experience',
+    'Vetted creator and KOL network with authentic reach',
+    'Transparent reporting and measurable performance metrics',
+    'Full-funnel support from awareness to community retention',
   ];
 
   return (
     <div className="pt-16">
-      <section className="bg-gradient-to-br from-blue-600 to-cyan-500 text-white py-20">
+      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-20" aria-label="About hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">About BlockWave Lab</h1>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            A global Web3 marketing studio helping crypto projects grow through influencer collaborations and community-driven campaigns.
+          <p className="text-sm uppercase tracking-[0.25em] text-blue-100 mb-4">About BlockWaveLab</p>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6">Growth Marketing for Web3 Teams</h1>
+          <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto">
+            BlockWaveLab is a crypto marketing agency helping Web3 projects grow using KOL marketing, influencer campaigns,
+            community growth, and PR.
           </p>
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white" aria-label="Company mission">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-bold mb-6 text-gray-900">Who We Are</h2>
-              <p className="text-lg text-gray-600 mb-4">
-                BlockWave Lab is a specialized Web3 marketing agency founded by crypto natives who understand the unique
-                challenges of building and scaling blockchain projects. We've been at the forefront of crypto marketing
-                since 2020, helping projects from ideation to exchange listings.
-              </p>
-              <p className="text-lg text-gray-600 mb-4">
-                Our team combines deep industry knowledge with creative marketing expertise. We don't just run campaigns—we
-                build narratives, foster communities, and create lasting connections between projects and their audiences.
-              </p>
-              <p className="text-lg text-gray-600">
-                With a network spanning Twitter, YouTube, Telegram, and beyond, we connect your project with authentic
-                voices that resonate with crypto investors, traders, and enthusiasts worldwide.
-              </p>
-            </div>
-            <div className="relative">
-              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Team collaboration"
-                  className="w-full h-full object-cover"
-                />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-4">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white flex items-center justify-center mb-5">
+                <Target size={28} />
               </div>
-              <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl -z-10"></div>
+              <h2 className="text-3xl font-bold text-gray-900">Company Mission</h2>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl p-10 text-white">
-              <div className="flex items-center mb-4">
-                <Target size={40} />
-              </div>
-              <h3 className="text-3xl font-bold mb-4">Our Mission</h3>
-              <p className="text-lg text-blue-100">
-                To amplify blockchain innovation through authentic influence. We empower crypto projects to reach their
-                target audiences through strategic partnerships with trusted voices in the Web3 ecosystem.
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-10 text-white">
-              <div className="flex items-center mb-4">
-                <Eye size={40} />
-              </div>
-              <h3 className="text-3xl font-bold mb-4">Our Vision</h3>
-              <p className="text-lg text-blue-100">
-                To bridge crypto brands and audiences through meaningful marketing. We envision a future where every
-                innovative blockchain project has access to the resources and connections needed to thrive.
+            <div className="lg:col-span-8">
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Our mission is to help serious Web3 projects earn real attention and trust in a crowded market. We focus on
+                sustainable growth by connecting your project with the right creators, communities, and media channels.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50" aria-label="What we do">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">Our Core Values</h2>
-            <p className="text-lg text-gray-600">The principles that guide everything we do</p>
+          <div className="max-w-3xl mb-10">
+            <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
+              <Briefcase size={24} />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">What We Do</h2>
+            <p className="text-lg text-gray-600">
+              We design and execute integrated marketing campaigns that help crypto startups, protocols, and ecosystems scale.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {values.map((value, index) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 hover:shadow-xl transition-all hover:-translate-y-2"
-              >
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center text-white mb-6">
-                  {value.icon}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {offerings.map((item) => (
+              <article key={item} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                  <p className="text-gray-700 text-lg">{item}</p>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-gray-900">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-white" aria-label="Our process">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-12">
+            <div className="w-12 h-12 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center mb-4">
+              <Workflow size={24} />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Our Process</h2>
+            <p className="text-lg text-gray-600">A clear framework that keeps campaigns aligned with your business outcomes.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {processSteps.map((step, index) => (
+              <div key={step.title} className="rounded-2xl border border-gray-100 p-7 bg-gradient-to-br from-blue-50 to-cyan-50">
+                <p className="text-sm font-semibold tracking-wide text-blue-700 mb-2">STEP {index + 1}</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                <p className="text-gray-700">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50" aria-label="Why choose us">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">Meet Our Team</h2>
-            <p className="text-lg text-gray-600">Experienced professionals dedicated to your success</p>
+          <div className="max-w-3xl mb-10">
+            <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
+              <ShieldCheck size={24} />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why Choose Us</h2>
+            <p className="text-lg text-gray-600">We combine crypto-native insight with performance-focused execution.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-2"
-              >
-                <div className="aspect-square overflow-hidden">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2 text-gray-900">{member.name}</h3>
-                  <p className="text-blue-600 font-medium">{member.role}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {reasons.map((reason) => (
+              <div key={reason} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 size={20} className="text-cyan-600 mt-1 flex-shrink-0" />
+                  <p className="text-gray-700">{reason}</p>
                 </div>
               </div>
             ))}
@@ -173,37 +144,20 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-16 bg-white border-y">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">Partner Exchanges & Platforms</h2>
-            <p className="text-gray-600">Trusted relationships with leading crypto exchanges</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-            {partners.map((partner) => (
-              <div
-                key={partner}
-                className="flex items-center justify-center text-gray-400 font-bold text-lg hover:text-blue-600 transition-colors"
-              >
-                {partner}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-cyan-500 text-white">
+      <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white" aria-label="Call to action">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Work With Us?</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Let's discuss how BlockWave Lab can help your crypto project reach new heights.
+          <h2 className="text-3xl sm:text-4xl font-bold mb-5">Ready to Grow Your Web3 Project?</h2>
+          <p className="text-lg sm:text-xl text-gray-300 mb-9">
+            Let us build a campaign strategy tailored to your token, audience, and launch goals.
           </p>
-          <a
-            href="#contact"
-            className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
+          <button
+            onClick={() => onNavigate('contact')}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
+            aria-label="Go to contact page"
           >
-            Start Your Campaign
-          </a>
+            <span>Contact BlockWaveLab</span>
+            <ArrowRight size={20} />
+          </button>
         </div>
       </section>
     </div>

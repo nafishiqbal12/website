@@ -13,6 +13,7 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
     { name: 'Home', path: 'home' },
     { name: 'About', path: 'about' },
     { name: 'Services', path: 'services' },
+    { name: 'Blog', path: 'blog' },
     { name: 'Case Studies', path: 'cases' },
     { name: 'Contact', path: 'contact' },
   ];

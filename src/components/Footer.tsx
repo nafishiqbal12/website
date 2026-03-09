@@ -1,6 +1,10 @@
 import { Twitter, Send, Mail, ArrowUp } from 'lucide-react';
 
-export default function Footer() {
+interface FooterProps {
+  onNavigate: (target: string) => void;
+}
+
+export default function Footer({ onNavigate }: FooterProps) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -53,24 +57,29 @@ export default function Footer() {
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-gray-400 text-sm" role="list">
                 <li role="listitem">
-                  <a href="#" className="hover:text-cyan-400 transition-colors">
+                  <button onClick={() => onNavigate('about')} className="hover:text-cyan-400 transition-colors">
                     About Us
-                  </a>
+                  </button>
                 </li>
                 <li role="listitem">
-                  <a href="#" className="hover:text-cyan-400 transition-colors">
+                  <button onClick={() => onNavigate('services')} className="hover:text-cyan-400 transition-colors">
                     Services
-                  </a>
+                  </button>
                 </li>
                 <li role="listitem">
-                  <a href="#" className="hover:text-cyan-400 transition-colors">
+                  <button onClick={() => onNavigate('blog')} className="hover:text-cyan-400 transition-colors">
+                    Blog
+                  </button>
+                </li>
+                <li role="listitem">
+                  <button onClick={() => onNavigate('cases')} className="hover:text-cyan-400 transition-colors">
                     Case Studies
-                  </a>
+                  </button>
                 </li>
                 <li role="listitem">
-                  <a href="#" className="hover:text-cyan-400 transition-colors">
+                  <button onClick={() => onNavigate('contact')} className="hover:text-cyan-400 transition-colors">
                     Contact
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -83,7 +92,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-cyan-500 transition-colors"
-                  aria-label="Telegram - Contact us on Telegram\"
+                  aria-label="Telegram - Contact us on Telegram"
                   role="listitem"
                 >
                   <Send size={20} />
