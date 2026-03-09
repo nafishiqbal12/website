@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/sync-google-verification.mjs",
     "build": "npm run sitemap && vite build",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "eslint .",
