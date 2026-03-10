@@ -86,25 +86,51 @@ export default function Home({ onNavigate }: HomeProps) {
   ];
 
   const partners = [
-    'Binance', 'MEXC', 'Gate.io', 'KuCoin', 'Bybit', 'Cointelegraph'
+    { name: 'Binance', logo: '/binance.png', large: true },
+    { name: 'MEXC', logo: '/mexc.png' },
+    { name: 'Gate.io', logo: '/gate.png' },
+    { name: 'KuCoin', logo: '/kucoin.png' },
+    { name: 'Bybit', logo: '/bybit.png' },
+    { name: 'Cointelegraph', logo: '/cointelegraph.png', large: true },
   ];
 
   const clientLogos = [
-    'ApexChain',
-    'NovaFi',
-    'MetaVault',
-    'BlockGrid',
-    'ChainSphere',
-    'OrbitDEX',
+    { name: 'Cartesi', logo: '/cartesi.png' },
+    { name: 'Celer', logo: '/celer.png' },
+    { name: 'Phala', logo: '/phala.png' },
+    { name: 'Reef', logo: '/reef.png' },
+    { name: 'Linear', logo: '/linear.png' },
+    { name: 'Frontier', logo: '/frontier.png' },
   ];
 
   const cryptoProjectLogos = [
-    'DeFiPulseX',
-    'ZeroLend',
-    'GameVerse3D',
-    'TokenForge',
-    'BridgeLayer',
-    'NFTFlow',
+    { name: 'DeFiPulseX', logo: '/defipulsex.svg' },
+    { name: 'ZeroLend', logo: '/zerolend.svg' },
+    { name: 'GameVerse3D', logo: '/gameverse3d.svg' },
+    { name: 'TokenForge', logo: '/tokenforge.svg' },
+    { name: 'BridgeLayer', logo: '/bridgelayer.svg' },
+    { name: 'NFTFlow', logo: '/nftflow.svg' },
+  ];
+
+  const caseStudies = [
+    {
+      title: 'Exchange Listing Growth Sprint',
+      result: '15M+ reach and $2M launch-day volume',
+      description:
+        'Executed a coordinated KOL and PR campaign around a CEX listing with pre-launch narrative and post-launch retention content.',
+    },
+    {
+      title: 'Web3 Game User Acquisition',
+      result: '100K+ pre-registrations in 30 days',
+      description:
+        'Activated gaming influencers and creator partnerships across YouTube and X to convert interest into active players.',
+    },
+    {
+      title: 'Community Revival Campaign',
+      result: '10x daily active community members',
+      description:
+        'Redesigned community structure, content cadence, and mod operations to increase retention and meaningful engagement.',
+    },
   ];
 
   const strategies = [
@@ -215,10 +241,21 @@ export default function Home({ onNavigate }: HomeProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {clientLogos.map((client) => (
               <div
-                key={client}
-                className="h-20 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white flex items-center justify-center text-gray-700 font-semibold"
+                key={client.name}
+                className="h-20 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white hover:border-cyan-400/50 transition-all duration-300 flex items-center justify-center p-2"
               >
-                {client}
+                <img
+                  src={client.logo}
+                  alt={`${client.name} logo`}
+                  style={{
+                    objectFit: 'contain',
+                    width: '100%',
+                    height: '100%',
+                    minHeight: '36px',
+                    maxHeight: '50px',
+                    display: 'block',
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -235,10 +272,21 @@ export default function Home({ onNavigate }: HomeProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {partners.map((partner) => (
               <div
-                key={partner}
-                className="h-20 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-700 font-semibold"
+                key={partner.name}
+                className="h-20 rounded-xl border border-gray-200 bg-white flex items-center justify-center p-3 hover:border-cyan-400/50 transition-all duration-300"
               >
-                {partner}
+                <img
+                  src={partner.logo}
+                  alt={`${partner.name} logo`}
+                  style={{
+                    objectFit: 'contain',
+                    width: '100%',
+                    height: '100%',
+                    minHeight: '36px',
+                    maxHeight: partner.large ? '56px' : '44px',
+                    display: 'block',
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -255,37 +303,57 @@ export default function Home({ onNavigate }: HomeProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {cryptoProjectLogos.map((project) => (
               <div
-                key={project}
-                className="h-20 rounded-xl border border-gray-200 bg-gradient-to-br from-cyan-50 to-blue-50 flex items-center justify-center text-gray-700 font-semibold"
+                key={project.name}
+                className="h-20 rounded-xl border border-gray-200 bg-gradient-to-br from-cyan-50 to-blue-50 flex items-center justify-center text-gray-700 font-semibold p-2"
               >
-                {project}
+                {project.logo ? (
+                  <img
+                    src={project.logo}
+                    alt={`${project.name} logo`}
+                    style={{
+                      objectFit: 'contain',
+                      width: '100%',
+                      height: '100%',
+                      minHeight: '36px',
+                      maxHeight: '52px',
+                      display: 'block',
+                    }}
+                  />
+                ) : (
+                  project.name
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-12 bg-[#0B0E14] border-y border-white/5" aria-label="Trusted partners">
+      <section
+        className="py-12 bg-gradient-to-br from-[#111827] via-[#1F2937] to-[#0F172A] border-y border-white/10"
+        aria-label="Trusted partners"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-white mb-3">From Launch to Listing</h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
               We help you navigate CEX requirements and connect with the right listing teams. These exchanges trust our referrals.
             </p>
           </div>
           <ExchangeMarquee />
 
-          <div className="mt-10 max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-6">
+          <div className="mt-10 max-w-4xl mx-auto relative overflow-hidden rounded-2xl p-6 border border-white/20 bg-gradient-to-br from-white/12 to-white/5 backdrop-blur-md shadow-[0_18px_45px_rgba(2,6,23,0.35)] transition-transform duration-300 hover:-translate-y-0.5">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute -top-16 -right-20 w-56 h-56 rounded-full bg-cyan-300/10 blur-3xl" />
             <h2 className="text-2xl font-bold text-white mb-3 text-center">Explore BlockWaveLab</h2>
-            <p className="text-gray-400 text-center mb-5">
+            <p className="text-slate-300 text-center mb-5">
               Learn about our services, team, case studies, and latest Web3 growth insights.
             </p>
-            <div className="flex flex-wrap justify-center gap-3 text-sm">
-              <a href="/services" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'services')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Services</a>
-              <a href="/about" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'about')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">About</a>
-              <a href="/contact" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'contact')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Contact</a>
-              <a href="/blog" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'blog')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Blog</a>
-              <a href="/case-studies" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'cases')} className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">Case Studies</a>
+            <div className="relative z-10 flex flex-wrap justify-center gap-3 text-sm">
+              <a href="/services" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'services')} className="px-4 py-2 rounded-lg bg-white/12 text-slate-100 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_16px_rgba(2,6,23,0.2)] hover:bg-white/20 transition-all">Services</a>
+              <a href="/about" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'about')} className="px-4 py-2 rounded-lg bg-white/12 text-slate-100 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_16px_rgba(2,6,23,0.2)] hover:bg-white/20 transition-all">About</a>
+              <a href="/contact" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'contact')} className="px-4 py-2 rounded-lg bg-white/12 text-slate-100 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_16px_rgba(2,6,23,0.2)] hover:bg-white/20 transition-all">Contact</a>
+              <a href="/blog" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'blog')} className="px-4 py-2 rounded-lg bg-white/12 text-slate-100 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_16px_rgba(2,6,23,0.2)] hover:bg-white/20 transition-all">Blog</a>
+              <a href="/case-studies" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'cases')} className="px-4 py-2 rounded-lg bg-white/12 text-slate-100 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_16px_rgba(2,6,23,0.2)] hover:bg-white/20 transition-all">Case Studies</a>
             </div>
           </div>
         </div>
@@ -397,6 +465,37 @@ export default function Home({ onNavigate }: HomeProps) {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-white" aria-label="Homepage case studies">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Case Studies</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Real Web3 campaigns with measurable outcomes across listings, community growth, and user acquisition.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+            {caseStudies.map((item) => (
+              <article key={item.title} className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-blue-50 p-7 shadow-sm hover:shadow-xl transition-all">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                <p className="text-cyan-700 font-semibold mb-4">{item.result}</p>
+                <p className="text-gray-600">{item.description}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <button
+              onClick={() => onNavigate('cases')}
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold hover:shadow-xl hover:scale-105 transition-all"
+            >
+              <span>View Full Case Studies</span>
+              <ArrowRight size={18} />
+            </button>
           </div>
         </div>
       </section>

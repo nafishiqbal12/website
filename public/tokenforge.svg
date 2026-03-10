@@ -1,0 +1,18 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tokenforge-mark" x1="42" y1="38" x2="138" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F97316" />
+      <stop offset="1" stop-color="#EF4444" />
+    </linearGradient>
+  </defs>
+
+  <rect x="28" y="28" width="124" height="124" rx="30" fill="#FFF2EA" />
+  <path d="M74 54H108L126 72V106L108 124H74L56 106V72L74 54Z" stroke="url(#tokenforge-mark)" stroke-width="10" stroke-linejoin="round" />
+  <path d="M72 82H108" stroke="url(#tokenforge-mark)" stroke-width="8" stroke-linecap="round" />
+  <path d="M72 98H98" stroke="#F97316" stroke-width="8" stroke-linecap="round" />
+  <circle cx="112" cy="82" r="5" fill="#EF4444" />
+  <circle cx="98" cy="98" r="5" fill="#F97316" />
+
+  <text x="186" y="88" fill="#0F172A" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="40" font-weight="700" letter-spacing="-0.03em">TokenForge</text>
+  <text x="188" y="118" fill="#64748B" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="500" letter-spacing="0.08em">ASSET ISSUANCE STACK</text>
+</svg>

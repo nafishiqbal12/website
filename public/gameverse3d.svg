@@ -1,0 +1,19 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gameverse-mark" x1="44" y1="36" x2="138" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22C55E" />
+      <stop offset="1" stop-color="#14B8A6" />
+    </linearGradient>
+  </defs>
+
+  <rect x="28" y="28" width="124" height="124" rx="30" fill="#EAFBF3" />
+  <path d="M60 74H120V106C120 120 108 132 94 132H86C72 132 60 120 60 106V74Z" stroke="url(#gameverse-mark)" stroke-width="10" stroke-linejoin="round" />
+  <path d="M76 60V88" stroke="url(#gameverse-mark)" stroke-width="8" stroke-linecap="round" />
+  <path d="M104 60V88" stroke="url(#gameverse-mark)" stroke-width="8" stroke-linecap="round" />
+  <circle cx="79" cy="101" r="6" fill="#22C55E" />
+  <circle cx="102" cy="101" r="6" fill="#14B8A6" />
+  <path d="M90 108V124" stroke="#10B981" stroke-width="8" stroke-linecap="round" />
+
+  <text x="186" y="88" fill="#0F172A" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="40" font-weight="700" letter-spacing="-0.03em">GameVerse3D</text>
+  <text x="188" y="118" fill="#64748B" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="500" letter-spacing="0.08em">IMMERSIVE GAME ECONOMY</text>
+</svg>

@@ -1,0 +1,20 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="defipulsex-mark" x1="46" y1="38" x2="136" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#38BDF8" />
+      <stop offset="1" stop-color="#06B6D4" />
+    </linearGradient>
+  </defs>
+
+  <rect x="28" y="28" width="124" height="124" rx="30" fill="#E6F8FE" />
+  <path d="M54 96H76L92 72L107 112L124 58L138 96" stroke="url(#defipulsex-mark)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="54" cy="96" r="6" fill="#0EA5E9" />
+  <circle cx="76" cy="96" r="6" fill="#22D3EE" />
+  <circle cx="92" cy="72" r="6" fill="#38BDF8" />
+  <circle cx="107" cy="112" r="6" fill="#22D3EE" />
+  <circle cx="124" cy="58" r="6" fill="#38BDF8" />
+  <circle cx="138" cy="96" r="6" fill="#06B6D4" />
+
+  <text x="186" y="88" fill="#0F172A" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="42" font-weight="700" letter-spacing="-0.03em">DeFiPulseX</text>
+  <text x="188" y="118" fill="#64748B" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="500" letter-spacing="0.08em">LIQUIDITY INTELLIGENCE</text>
+</svg>
