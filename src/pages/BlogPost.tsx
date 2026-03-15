@@ -106,13 +106,17 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
           <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
           <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
 
-          <div className="prose prose-lg max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-headings:text-gray-900 prose-headings:font-bold">
-            {post.content.map((block) => {
+          <div className="max-w-none text-lg leading-relaxed text-gray-700 space-y-5">
+            {post.content.map((block, index) => {
               if (block.startsWith('## ')) {
-                return <h2 key={block}>{block.replace('## ', '')}</h2>;
+                return (
+                  <h2 key={`${post.slug}-heading-${index}`} className="text-2xl sm:text-3xl font-bold text-gray-900 pt-4">
+                    {block.replace('## ', '')}
+                  </h2>
+                );
               }
 
-              return <p key={block}>{block}</p>;
+              return <p key={`${post.slug}-paragraph-${index}`}>{block}</p>;
             })}
           </div>
 
