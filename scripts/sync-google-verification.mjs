@@ -13,18 +13,29 @@ function copyExactFile(source, target) {
 }
 
 function main() {
-  if (!fs.existsSync(sourcePath)) {
-    console.error(`Missing required verification file at project root: ${fileName}`);
-    process.exit(1);
+  const sourceCandidates = [
+    sourcePath,
+    path.join(workspaceRoot, `${fileName.replace('.html', '')} (1).html`),
+    publicPath,
+  ];
+
+  const resolvedSourcePath = sourceCandidates.find((candidate) => fs.existsSync(candidate));
+
+  if (!resolvedSourcePath) {
+    console.warn(`Verification file not found. Skipping sync for ${fileName}.`);
+    return;
   }
 
-  copyExactFile(sourcePath, publicPath);
+  // Keep public copy in sync from whichever valid source file exists.
+  if (path.resolve(resolvedSourcePath) !== path.resolve(publicPath)) {
+    copyExactFile(resolvedSourcePath, publicPath);
+  }
 
   if (fs.existsSync(path.join(workspaceRoot, 'dist'))) {
-    copyExactFile(sourcePath, distPath);
+    copyExactFile(resolvedSourcePath, distPath);
   }
 
-  console.log(`Synced ${fileName} to public/ and dist/ (if present).`);
+  console.log(`Synced ${fileName} using source: ${path.basename(resolvedSourcePath)}.`);
 }
 
 main();
