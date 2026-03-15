@@ -5,6 +5,8 @@ interface FooterProps {
 }
 
 export default function Footer({ onNavigate }: FooterProps) {
+  const currentYear = new Date().getFullYear();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -126,7 +128,7 @@ export default function Footer({ onNavigate }: FooterProps) {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2025 BlockWave Lab — All Rights Reserved.</p>
+            <p>&copy; {currentYear} BlockWave Lab - All Rights Reserved.</p>
           </div>
         </div>
       </footer>
