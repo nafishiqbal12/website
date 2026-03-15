@@ -106,7 +106,7 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
           <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
           <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
 
-          <div className="max-w-none text-lg leading-relaxed text-gray-700 space-y-5">
+          <div className="max-w-none text-lg leading-relaxed space-y-5">
             {post.content.map((block, index) => {
               if (block.startsWith('## ')) {
                 return (
@@ -116,7 +116,11 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
                 );
               }
 
-              return <p key={`${post.slug}-paragraph-${index}`}>{block}</p>;
+              return (
+                <p key={`${post.slug}-paragraph-${index}`} className="text-gray-700 leading-relaxed">
+                  {block}
+                </p>
+              );
             })}
           </div>
 
