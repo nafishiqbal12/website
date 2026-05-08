@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Mail, Send, Calendar, MessageSquare, CheckCircle2, ArrowRight } from 'lucide-react';
+import SEO from '../lib/seo/SEO';
 
 type ContactFormData = {
   name: string;
@@ -41,6 +42,11 @@ export default function Contact() {
 
   return (
     <div className="pt-16">
+      <SEO
+        title="Contact — Work With BlockWaveLab"
+        description="Contact BlockWaveLab for crypto KOL marketing, token launch support, influencer campaigns, PR, and community growth services."
+        canonical="https://blockwavelab.com/contact"
+      />
       <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-20" aria-label="Contact hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm uppercase tracking-[0.25em] text-blue-100 mb-4">Contact BlockWaveLab</p>

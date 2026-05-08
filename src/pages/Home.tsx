@@ -1,6 +1,7 @@
 import { TrendingUp, Users, Newspaper, ArrowRight, CheckCircle, Send } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import ExchangeMarquee from '../components/ExchangeMarquee';
+import SEO from '../lib/seo/SEO';
 
 interface HomeProps {
   onNavigate: (page: string) => void;
@@ -180,6 +181,11 @@ export default function Home({ onNavigate }: HomeProps) {
 
   return (
     <div className="pt-16">
+      <SEO
+        title="Crypto Marketing Agency & Web3 Growth"
+        description="BlockWaveLab helps crypto startups, memecoin founders, and Web3 projects grow with KOL marketing, token launch support, influencer campaigns, PR, and community growth."
+        canonical="https://blockwavelab.com"
+      />
       <section className="relative bg-[#0B0E14] py-20 lg:py-40 overflow-hidden" aria-label="Hero section">
         {/* Animated Radial Gradient Glow */}
         <div className="absolute inset-0 overflow-hidden">

@@ -1,37 +1,15 @@
 import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 import type { MouseEvent } from 'react';
-import { BLOG_POSTS, type BlogPost } from '../content/blogPosts';
+import SEO from '../lib/seo/SEO';
+import { getAllPosts, type Post } from '../lib/blog';
 
 interface BlogPostPageProps {
-  post: BlogPost;
+  post: Post;
   onNavigate: (target: string) => void;
 }
 
 export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
-  const relatedPosts = BLOG_POSTS.filter((item) => item.slug !== post.slug).slice(0, 2);
-
-  const articleSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.description,
-    datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
-    author: {
-      '@type': 'Organization',
-      name: post.author,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'BlockWaveLab',
-      url: 'https://blockwavelab.com',
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `https://blockwavelab.com/blog/${post.slug}`,
-    },
-    keywords: post.tags.join(', '),
-  };
+  const relatedPosts = getAllPosts().filter((item) => item.slug !== post.slug).slice(0, 2);
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -65,6 +43,17 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
 
   return (
     <div className="pt-16">
+      <SEO
+        title={post.title}
+        description={post.description}
+        canonical={`https://blockwavelab.com/blog/${post.slug}`}
+        type="article"
+        publishedTime={post.publishedAt}
+        modifiedTime={post.publishedAt}
+        author={post.author}
+        tags={post.tags}
+        jsonLd={breadcrumbSchema}
+      />
       <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-16" aria-label="Blog article header">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav aria-label="Breadcrumb" className="mb-6 text-sm text-blue-100/90">
@@ -86,16 +75,16 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
             <span>Back to Blog</span>
           </a>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-4 leading-tight">{post.title}</h1>
-          <p className="text-lg text-blue-100 mb-6">{post.excerpt}</p>
+          <p className="text-lg text-blue-100 mb-6">{post.description}</p>
           <div className="flex flex-wrap items-center gap-4 text-sm text-blue-100">
             <time className="inline-flex items-center gap-1" dateTime={post.publishedAt}>
               <Calendar size={14} />
               {post.publishedAt}
             </time>
-            <span className="inline-flex items-center gap-1">
-              <Clock size={14} />
-              {post.readTime}
-            </span>
+              <span className="inline-flex items-center gap-1">
+                <Clock size={14} />
+                {post.readingTime ?? ''}
+              </span>
             <span>By {post.author}</span>
           </div>
         </div>
@@ -103,25 +92,10 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
 
       <article className="py-16 bg-white" aria-label="Blog article content">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
-          <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+          {/* JSON-LD injected via SEO component */}
 
-          <div className="max-w-none text-lg leading-relaxed space-y-5">
-            {post.content.map((block, index) => {
-              if (block.startsWith('## ')) {
-                return (
-                  <h2 key={`${post.slug}-heading-${index}`} className="text-2xl sm:text-3xl font-bold text-gray-900 pt-4">
-                    {block.replace('## ', '')}
-                  </h2>
-                );
-              }
-
-              return (
-                <p key={`${post.slug}-paragraph-${index}`} className="text-gray-700 leading-relaxed">
-                  {block}
-                </p>
-              );
-            })}
+          <div className="max-w-none prose prose-lg dark:prose-invert">
+            <post.Component />
           </div>
 
           <div className="mt-10 flex flex-wrap gap-2">
@@ -164,7 +138,7 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
             {relatedPosts.map((related) => (
               <article key={related.slug} className="bg-white rounded-xl border border-gray-100 p-5">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{related.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{related.excerpt}</p>
+                <p className="text-gray-600 text-sm mb-4">{related.description}</p>
                 <a
                   href={`/blog/${related.slug}`}
                   onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, `/blog/${related.slug}`)}

@@ -8,6 +8,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import type { MouseEvent } from 'react';
+import SEO from '../lib/seo/SEO';
 
 interface ServicesProps {
   onNavigate: (page: string) => void;
@@ -95,6 +96,12 @@ const benefits = [
 export default function Services({ onNavigate }: ServicesProps) {
   return (
     <div className="pt-16">
+      <SEO
+        title="Services — Crypto KOL Marketing & Token Launch"
+        description="Crypto KOL marketing, token launch marketing, Web3 influencer campaigns, community growth, and PR — services to scale your Web3 project."
+        canonical="https://blockwavelab.com/services"
+        type="service"
+      />
       <section
         className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-20"
         aria-label="Services hero"

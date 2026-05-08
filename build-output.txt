@@ -1,0 +1,40 @@
+
+> vite-react-typescript-starter@0.0.0 prebuild
+> node scripts/sync-google-verification.mjs
+
+Synced google3f437b20b9da007e.html using source: google3f437b20b9da007e (1).html.
+
+> vite-react-typescript-starter@0.0.0 build
+> npm run og && npm run sitemap && vite build
+
+
+> vite-react-typescript-starter@0.0.0 og
+> node scripts/generate-og.mjs
+
+Generated 30 OG images.
+
+> vite-react-typescript-starter@0.0.0 sitemap
+> node scripts/generate-sitemap.mjs
+
+Sitemap generated with 32 URLs.
+vite v7.3.0 building client environment for production...
+transforming...
+✓ 1502 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                    3.11 kB │ gzip:  0.98 kB
+dist/assets/index-Cqv6boTD.css                    39.37 kB │ gzip:  6.73 kB
+dist/assets/clock-C8NZianN.js                      0.18 kB │ gzip:  0.17 kB
+dist/assets/calendar-w54czeoK.js                   0.25 kB │ gzip:  0.20 kB
+dist/assets/CryptoPRMarketing-HBIfPsTA.js          2.99 kB │ gzip:  1.30 kB
+dist/assets/TelegramCommunityGrowth-PgiQ7pki.js    3.11 kB │ gzip:  1.24 kB
+dist/assets/Web3InfluencerMarketing-ZHRRxUKv.js    3.13 kB │ gzip:  1.30 kB
+dist/assets/TokenLaunchMarketing-StWuMfBp.js       3.63 kB │ gzip:  1.40 kB
+dist/assets/BlogPost-B6nqusuz.js                   4.53 kB │ gzip:  1.55 kB
+dist/assets/Blog-Z02dDf3H.js                       4.61 kB │ gzip:  1.57 kB
+dist/assets/BlogTag-0997mwXa.js                    5.44 kB │ gzip:  1.75 kB
+dist/assets/CryptoKolMarketing-BvJ6vMLu.js         6.16 kB │ gzip:  2.06 kB
+dist/assets/CaseStudies-D2ijFXIa.js                8.38 kB │ gzip:  2.61 kB
+dist/assets/Contact-BxzSIohC.js                   10.13 kB │ gzip:  2.54 kB
+dist/assets/index-BjfX7pRx.js                    241.30 kB │ gzip: 73.47 kB
+✓ built in 4.38s

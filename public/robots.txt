@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Block any low-value or staging paths (update as needed)
+# Disallow: /private/
+
+# Sitemap reference for search engines
 Sitemap: https://blockwavelab.com/sitemap.xml
+
+# Recommended: allow full crawling on public content and control indexing via per-page canonical/meta tags

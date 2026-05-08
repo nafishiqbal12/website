@@ -1,17 +1,19 @@
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import type { MouseEvent } from 'react';
-import { BLOG_POSTS } from '../content/blogPosts';
+import { getAllPosts } from '../lib/blog';
+import SEO from '../lib/seo/SEO';
 
 interface BlogProps {
   onNavigate: (target: string) => void;
 }
 
 export default function Blog({ onNavigate }: BlogProps) {
+  const description = 'Tactical playbooks and how-tos for KOL campaigns, token launches, community growth, and PR in Web3.';
   const itemListSchema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'BlockWaveLab Blog Articles',
-    itemListElement: BLOG_POSTS.map((post, index) => ({
+    itemListElement: getAllPosts().map((post, index) => ({
       '@type': 'ListItem',
       position: index + 1,
       url: `https://blockwavelab.com/blog/${post.slug}`,
@@ -26,6 +28,7 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   return (
     <div className="pt-16">
+      <SEO title="Blog — Crypto Marketing Insights" description={description} canonical="https://blockwavelab.com/blog" />
       <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-20" aria-label="Blog hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm uppercase tracking-[0.25em] text-blue-100 mb-4">BlockWaveLab Blog</p>
@@ -65,7 +68,7 @@ export default function Blog({ onNavigate }: BlogProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
-            {BLOG_POSTS.map((post) => (
+            {getAllPosts().map((post) => (
               <article key={post.slug} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all overflow-hidden">
                 <div className="h-1.5 bg-gradient-to-r from-blue-600 to-cyan-500" />
                 <div className="p-7">
@@ -76,11 +79,11 @@ export default function Blog({ onNavigate }: BlogProps) {
                     </time>
                     <span className="inline-flex items-center gap-1">
                       <Clock size={14} />
-                      {post.readTime}
+                      {post.readingTime ?? ''}
                     </span>
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">{post.title}</h2>
-                  <p className="text-gray-600 mb-5">{post.excerpt}</p>
+                  <p className="text-gray-600 mb-5">{post.description}</p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {post.tags.map((tag) => (
                       <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
