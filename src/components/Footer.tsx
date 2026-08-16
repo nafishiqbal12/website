@@ -1,4 +1,5 @@
 import { Twitter, Send, Mail, ArrowUp } from 'lucide-react';
+import { Badge, Button, Container } from './ui';
 
 interface FooterProps {
   onNavigate: (target: string) => void;
@@ -13,16 +14,16 @@ export default function Footer({ onNavigate }: FooterProps) {
 
   return (
     <>
-      <button
+      <Button
         onClick={scrollToTop}
-        className="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-3 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all z-40"
+        className="fixed bottom-8 right-8 z-40 h-11 w-11 rounded-full p-0"
         aria-label="Scroll to top of page"
       >
         <ArrowUp size={20} />
-      </button>
+      </Button>
 
-      <footer className="bg-gray-900 text-white py-12" aria-label="Site footer">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="border-t border-slate-800 bg-slate-950 text-white" aria-label="Site footer">
+        <Container className="py-12 lg:py-14">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
@@ -50,37 +51,40 @@ export default function Footer({ onNavigate }: FooterProps) {
                 </div>
                 <span className="text-xl font-bold">BlockWave Lab</span>
               </div>
-              <p className="text-gray-400 text-sm">
-                Empowering Crypto Growth Through Influence
+              <p className="text-slate-300 text-sm">
+                AI Automation and DevOps Partner for Web3 Projects
               </p>
+              <div className="mt-4">
+                <Badge tone="info">Build • Automate • Operate • Grow</Badge>
+              </div>
             </div>
 
             <div>
               <h3 className="font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2 text-gray-400 text-sm" role="list">
+              <ul className="space-y-2 text-slate-300 text-sm" role="list">
                 <li role="listitem">
-                  <button onClick={() => onNavigate('about')} className="hover:text-cyan-400 transition-colors">
-                    About Us
+                  <button onClick={() => onNavigate('build')} className="bw-focus rounded-sm hover:text-cyan-300 transition-colors">
+                    BUILD
                   </button>
                 </li>
                 <li role="listitem">
-                  <button onClick={() => onNavigate('services')} className="hover:text-cyan-400 transition-colors">
-                    Services
+                  <button onClick={() => onNavigate('automate')} className="bw-focus rounded-sm hover:text-cyan-300 transition-colors">
+                    AUTOMATE
                   </button>
                 </li>
                 <li role="listitem">
-                  <button onClick={() => onNavigate('blog')} className="hover:text-cyan-400 transition-colors">
+                  <button onClick={() => onNavigate('operate')} className="bw-focus rounded-sm hover:text-cyan-300 transition-colors">
+                    OPERATE
+                  </button>
+                </li>
+                <li role="listitem">
+                  <button onClick={() => onNavigate('grow')} className="bw-focus rounded-sm hover:text-cyan-300 transition-colors">
+                    GROW
+                  </button>
+                </li>
+                <li role="listitem">
+                  <button onClick={() => onNavigate('/blog')} className="bw-focus rounded-sm hover:text-cyan-300 transition-colors">
                     Blog
-                  </button>
-                </li>
-                <li role="listitem">
-                  <button onClick={() => onNavigate('cases')} className="hover:text-cyan-400 transition-colors">
-                    Case Studies
-                  </button>
-                </li>
-                <li role="listitem">
-                  <button onClick={() => onNavigate('contact')} className="hover:text-cyan-400 transition-colors">
-                    Contact
                   </button>
                 </li>
               </ul>
@@ -93,7 +97,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                   href="https://t.me/Alex_TNH"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-cyan-500 transition-colors"
+                  className="bw-focus flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 transition-colors hover:bg-cyan-500"
                   aria-label="Telegram - Contact us on Telegram"
                   role="listitem"
                 >
@@ -103,7 +107,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                   href="https://twitter.com/Blockwavelab"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-cyan-500 transition-colors"
+                  className="bw-focus flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 transition-colors hover:bg-cyan-500"
                   aria-label="Twitter - Follow us on Twitter"
                   role="listitem"
                 >
@@ -111,7 +115,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                 </a>
                 <a
                   href="mailto:hello@blockwavelab.com"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-cyan-500 transition-colors"
+                  className="bw-focus flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 transition-colors hover:bg-cyan-500"
                   aria-label="Email - Send us a message"
                   role="listitem"
                 >
@@ -119,7 +123,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                 </a>
               </div>
               <div className="mt-4">
-                <p className="text-gray-400 text-sm">
+                <p className="text-slate-300 text-sm">
                   <Mail size={16} className="inline mr-2" aria-hidden="true" />
                   hello@blockwavelab.com
                 </p>
@@ -127,10 +131,10 @@ export default function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
+          <div className="border-t border-slate-800 pt-8 text-center text-slate-400 text-sm">
             <p>&copy; {currentYear} BlockWave Lab - All Rights Reserved.</p>
           </div>
-        </div>
+        </Container>
       </footer>
     </>
   );

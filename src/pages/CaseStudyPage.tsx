@@ -49,7 +49,6 @@ export default function CaseStudyPage({ caseStudy, onNavigate }: Props) {
           <h3 className="font-semibold mb-2">Screenshots</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {caseStudy.screenshots.map((s) => (
-              // eslint-disable-next-line jsx-a11y/img-redundant-alt
               <img key={s} src={s} alt={`${caseStudy.client} screenshot`} className="w-full rounded" />
             ))}
           </div>

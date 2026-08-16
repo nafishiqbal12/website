@@ -21,7 +21,7 @@ const SITE_NAME = 'BlockWaveLab';
 const SITE_URL = 'https://blockwavelab.com';
 
 function buildTitle(title?: string) {
-  if (!title) return `${SITE_NAME} | Crypto Marketing Agency`;
+  if (!title) return `${SITE_NAME} | AI Automation and DevOps Partner for Web3 Projects`;
   return `${title} — ${SITE_NAME}`;
 }
 
@@ -40,7 +40,9 @@ export default function SEO({
   jsonLd,
 }: SEOProps) {
   const fullTitle = buildTitle(title);
-  const metaDescription = description || 'BlockWaveLab is a crypto marketing agency specializing in KOL marketing, token launches, influencer campaigns, and community growth.';
+  const metaDescription =
+    description ||
+    'BlockWaveLab helps Web3 teams build infrastructure, automate workflows, operate production systems, and grow with practical execution support.';
   const url = canonical ?? SITE_URL;
 
   const defaultImage = image ?? resolveOgImageUrl({ canonical: url, type, title, tags });

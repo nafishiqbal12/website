@@ -1,9 +1,11 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type ComponentType } from 'react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
-import Home from '../pages/Home';
-import About from '../pages/About';
-import Services from '../pages/Services';
+import Home from '../pages/V2Home';
+import BuildPage from '../pages/BuildPage';
+import AutomatePage from '../pages/AutomatePage';
+import OperatePage from '../pages/OperatePage';
+import PillarPage from '../pages/PillarPage';
 import { getPostBySlug, type Post } from '../lib/blog';
 import { getSeoForRoute } from './seoConfig';
 import {
@@ -13,28 +15,11 @@ import {
   getRouteFromPath,
   getNavPage,
 } from './routeConfig';
-
-type EmptyProps = Record<string, never>;
-const Contact = lazy(() => import('../pages/Contact') as Promise<{ default: ComponentType<EmptyProps> }>);
 const Blog = lazy(() => import('../pages/Blog') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
 const BlogPostPage = lazy(() => import('../pages/BlogPost') as Promise<{ default: ComponentType<{ post: Post; onNavigate: (target: string) => void }> }>);
 const BlogTag = lazy(() => import('../pages/BlogTag') as Promise<{ default: ComponentType<{ tag: string; onNavigate: (target: string) => void }> }>);
 const CaseStudies = lazy(() => import('../pages/CaseStudies') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
 const CaseStudyPage = lazy(() => import('../pages/CaseStudyPage') as Promise<{ default: ComponentType<{ caseStudy: any; onNavigate: (target: string) => void }> }>);
-const CryptoKolMarketing = lazy(() => import('../pages/CryptoKolMarketing') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const TokenLaunchMarketing = lazy(() => import('../pages/TokenLaunchMarketing') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const Web3InfluencerMarketing = lazy(() => import('../pages/Web3InfluencerMarketing') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const TelegramCommunityGrowth = lazy(() => import('../pages/TelegramCommunityGrowth') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const CryptoPRMarketing = lazy(() => import('../pages/CryptoPRMarketing') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const BlockchainMarketingAgency = lazy(() => import('../pages/BlockchainMarketingAgency') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const CryptoMarketingAgency = lazy(() => import('../pages/CryptoMarketingAgency') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const BlockchainSEO = lazy(() => import('../pages/BlockchainSEO') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const Web3GrowthMarketing = lazy(() => import('../pages/Web3GrowthMarketing') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const CryptoCommunityManagement = lazy(() => import('../pages/CryptoCommunityManagement') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const CryptoInfluencerMarketing = lazy(() => import('../pages/CryptoInfluencerMarketing') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const BlockchainPRServices = lazy(() => import('../pages/BlockchainPRServices') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const CryptoPaidAds = lazy(() => import('../pages/CryptoPaidAds') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
-const AiBlockchainMarketing = lazy(() => import('../pages/AiBlockchainMarketing') as Promise<{ default: ComponentType<{ onNavigate: (target: string) => void }> }>);
 
 function upsertMeta(selector: string, attribute: 'name' | 'property', key: string, content: string) {
   let meta = document.head.querySelector<HTMLMetaElement>(selector);
@@ -218,7 +203,7 @@ export default function AppRouter() {
       logo: `${SITE_URL}/favicon.svg`,
       sameAs: ['https://twitter.com/Blockwavelab', 'https://t.me/Alex_TNH'],
       description:
-        'BlockWaveLab is a crypto marketing agency and web3 marketing agency focused on crypto KOL marketing and web3 influencer marketing.',
+        'BlockWaveLab is an AI automation and DevOps partner for Web3 projects.',
     });
 
     upsertJsonLd('website', {
@@ -226,10 +211,64 @@ export default function AppRouter() {
       '@type': 'WebSite',
       name: 'BlockWaveLab',
       url: SITE_URL,
-      description: 'Crypto marketing agency for Web3 growth, KOL campaigns, influencer marketing, PR, and community expansion.',
+      description: 'Build. Automate. Operate. Grow. AI automation and DevOps support for Web3 teams.',
     });
 
-    if (seo.ogType === 'service' || route.page === 'services' || route.page === 'crypto-kol' || route.page === 'token-launch' || route.page === 'web3-influencer' || route.page === 'telegram-growth' || route.page === 'crypto-pr') {
+    if (route.page === 'home') {
+      upsertJsonLd('home-page', {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: 'BlockWaveLab Homepage',
+        url: SITE_URL,
+        description: seo.description,
+        about: [
+          'DevOps and cloud infrastructure',
+          'AI agents and workflow automation',
+          'Managed DevOps and AI operations',
+          'Growth, content and community',
+        ],
+      });
+    } else {
+      removeJsonLd('home-page');
+    }
+
+    if (seo.ogType === 'service' || route.page === 'build' || route.page === 'automate' || route.page === 'operate' || route.page === 'grow') {
+      const serviceTypeByPage: Record<string, string[]> = {
+        build: [
+          'DevOps and cloud infrastructure',
+          'CI/CD pipeline design and hardening',
+          'Containerization and deployment workflows',
+          'Infrastructure reliability baselines',
+          'Security and access baseline setup',
+        ],
+        automate: [
+          'AI-assisted workflow design for delivery and operations',
+          'Internal agent task orchestration',
+          'Automation for reporting, triage, and routine operational flows',
+          'Human-in-the-loop checkpoints for high-impact actions',
+          'Prompt and policy versioning for controlled automation',
+        ],
+        operate: [
+          'Managed deployment and release operations',
+          'Incident response coordination and runbook execution',
+          'Performance and reliability operations',
+          'Change-management and operational governance',
+          'Ongoing AI operations support for deployed automations',
+        ],
+        grow: [
+          'Growth, content and community operations',
+          'Delivery-aligned growth execution support',
+          'Cross-functional growth and operations feedback loops',
+        ],
+      };
+
+      const activeServiceTypes = serviceTypeByPage[route.page] ?? [
+        'DevOps and cloud infrastructure',
+        'AI agents and workflow automation',
+        'Managed DevOps and AI operations',
+        'Growth, content and community',
+      ];
+
       upsertJsonLd('service', {
         '@context': 'https://schema.org',
         '@type': 'Service',
@@ -239,12 +278,7 @@ export default function AppRouter() {
           name: 'BlockWaveLab',
           url: SITE_URL,
         },
-        serviceType: [
-          'crypto marketing agency',
-          'web3 marketing agency',
-          'crypto KOL marketing',
-          'web3 influencer marketing',
-        ],
+        serviceType: activeServiceTypes,
         areaServed: 'Global',
         url: `${SITE_URL}${seo.path}`,
         description: seo.description,
@@ -252,44 +286,20 @@ export default function AppRouter() {
     } else {
       removeJsonLd('service');
     }
-  }, [route, currentBlogPost]);
+  }, [route, currentBlogPost, currentCaseStudy]);
 
   const renderPage = () => {
     switch (route.page) {
       case 'home':
         return <Home onNavigate={navigate} />;
-      case 'about':
-        return <About onNavigate={navigate} />;
-      case 'services':
-        return <Services onNavigate={navigate} />;
-      case 'crypto-kol':
-        return <CryptoKolMarketing onNavigate={navigate} />;
-      case 'token-launch':
-        return <TokenLaunchMarketing onNavigate={navigate} />;
-      case 'web3-influencer':
-        return <Web3InfluencerMarketing onNavigate={navigate} />;
-      case 'telegram-growth':
-        return <TelegramCommunityGrowth onNavigate={navigate} />;
-      case 'crypto-pr':
-        return <CryptoPRMarketing onNavigate={navigate} />;
-      case 'blockchain-marketing':
-        return <BlockchainMarketingAgency onNavigate={navigate} />;
-      case 'crypto-marketing':
-        return <CryptoMarketingAgency onNavigate={navigate} />;
-      case 'blockchain-seo':
-        return <BlockchainSEO onNavigate={navigate} />;
-      case 'web3-growth-marketing':
-        return <Web3GrowthMarketing onNavigate={navigate} />;
-      case 'crypto-community-management':
-        return <CryptoCommunityManagement onNavigate={navigate} />;
-      case 'crypto-influencer-marketing':
-        return <CryptoInfluencerMarketing onNavigate={navigate} />;
-      case 'blockchain-pr-services':
-        return <BlockchainPRServices onNavigate={navigate} />;
-      case 'crypto-paid-ads':
-        return <CryptoPaidAds onNavigate={navigate} />;
-      case 'ai-blockchain-marketing':
-        return <AiBlockchainMarketing onNavigate={navigate} />;
+      case 'build':
+        return <BuildPage onNavigate={navigate} />;
+      case 'automate':
+        return <AutomatePage onNavigate={navigate} />;
+      case 'operate':
+        return <OperatePage onNavigate={navigate} />;
+      case 'grow':
+        return <PillarPage pillar="grow" onNavigate={navigate} />;
       case 'cases':
         return <CaseStudies onNavigate={navigate} />;
       case 'case-study':
@@ -298,8 +308,6 @@ export default function AppRouter() {
         ) : (
           <CaseStudies onNavigate={navigate} />
         );
-      case 'contact':
-        return <Contact />;
       case 'blog':
         return <Blog onNavigate={navigate} />;
       case 'blog-post':

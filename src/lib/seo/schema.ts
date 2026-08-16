@@ -55,7 +55,7 @@ export function generateServiceSchema({
     '@type': 'ProfessionalService',
     name: SITE_NAME,
     description: description ?? `Services from ${SITE_NAME}`,
-    serviceType: title ?? 'Crypto Marketing',
+    serviceType: title ?? 'AI Automation and DevOps Services for Web3 Projects',
     url: SITE_URL,
   };
 }

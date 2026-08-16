@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { Button, Container, StatusIndicator } from './ui';
+import { cn } from '../lib/cn';
 
 interface NavigationProps {
   currentPage: string;
@@ -11,11 +13,10 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
 
   const navItems = [
     { name: 'Home', path: 'home' },
-    { name: 'About', path: 'about' },
-    { name: 'Services', path: 'services' },
-    { name: 'Blog', path: 'blog' },
-    { name: 'Case Studies', path: 'cases' },
-    { name: 'Contact', path: 'contact' },
+    { name: 'BUILD', path: 'build' },
+    { name: 'AUTOMATE', path: 'automate' },
+    { name: 'OPERATE', path: 'operate' },
+    { name: 'GROW', path: 'grow' },
   ];
 
   const handleNavigate = (path: string) => {
@@ -25,8 +26,8 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
   };
 
   return (
-    <nav className="sticky top-0 left-0 right-0 bg-gradient-to-b from-[#0B0E14]/95 to-[#0B0E14]/80 backdrop-blur-xl z-50 border-b border-white/5 shadow-2xl" aria-label="Primary navigation">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 left-0 right-0 z-50 border-b border-slate-700/50 bg-slate-950/80 backdrop-blur-xl" aria-label="Primary navigation">
+      <Container>
         <div className="flex justify-between items-center h-16">
           <div
             className="flex items-center space-x-3 cursor-pointer group"
@@ -34,7 +35,7 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
             role="button"
             tabIndex={0}
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleNavigate('home')}
-            aria-label="BlockWave Lab - Home"
+            aria-label="BlockWaveLab - Home"
           >
             <div className="relative w-10 h-10 transform group-hover:scale-110 transition-transform">
               <svg viewBox="0 0 200 200" className="w-full h-full" aria-hidden="true">
@@ -58,71 +59,59 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
                 </g>
               </svg>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
               BlockWave Lab
+            </span>
+            <span className="hidden lg:inline-flex">
+              <StatusIndicator tone="online" label="v2 live" />
             </span>
           </div>
 
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-5">
             {navItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => handleNavigate(item.path)}
-                className={`text-sm font-medium transition-colors ${
-                  currentPage === item.path
-                    ? 'text-cyan-400'
-                    : 'text-gray-300 hover:text-cyan-400'
-                }`}
+                className={cn(
+                  'bw-focus rounded-md px-2 py-1 text-sm font-medium transition-colors',
+                  currentPage === item.path ? 'text-cyan-300' : 'text-slate-300 hover:text-cyan-300',
+                )}
               >
                 {item.name}
               </button>
             ))}
-            <button
-              onClick={() => handleNavigate('contact')}
-              className="relative px-6 py-2 rounded-lg font-medium overflow-hidden group"
-            >
-              <div className="absolute inset-0 bg-white/10 backdrop-blur rounded-lg border border-white/20 group-hover:border-white/40 group-hover:bg-white/15 transition-all"></div>
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" style={{
-                backgroundImage: 'radial-gradient(circle at 0% 0%, #00D9FF 0%, transparent 50%)',
-                filter: 'blur(8px)'
-              }}></div>
-              <span className="relative z-10 text-white">Get Started</span>
-            </button>
+            <Button onClick={() => handleNavigate('build')} size="sm">Explore Pillars</Button>
           </div>
 
           <button
-            className="md:hidden text-gray-300"
+            className="bw-focus rounded-md p-1 text-slate-300 md:hidden"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle navigation menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-      </div>
+      </Container>
 
       {isOpen && (
-        <div className="md:hidden bg-gradient-to-b from-[#0B0E14]/95 to-[#0B0E14]/90 border-t border-white/5">
-          <div className="px-4 py-4 space-y-3">
+        <div className="md:hidden border-t border-slate-700/60 bg-slate-950/95">
+          <Container className="py-4 space-y-3">
             {navItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => handleNavigate(item.path)}
-                className={`block w-full text-left px-4 py-2 rounded-lg transition-colors ${
+                className={cn(
+                  'bw-focus block w-full rounded-lg px-4 py-2 text-left transition-colors',
                   currentPage === item.path
-                    ? 'bg-white/10 text-cyan-400'
-                    : 'text-gray-300 hover:bg-white/5'
-                }`}
+                    ? 'border border-cyan-400/30 bg-cyan-500/10 text-cyan-300'
+                    : 'text-slate-300 hover:bg-slate-800/70',
+                )}
               >
                 {item.name}
               </button>
             ))}
-            <button
-              onClick={() => handleNavigate('contact')}
-              className="w-full relative px-6 py-2 rounded-lg font-medium overflow-hidden group"
-            >
-              <div className="absolute inset-0 bg-white/10 backdrop-blur rounded-lg border border-white/20 group-hover:border-white/40 group-hover:bg-white/15 transition-all"></div>
-              <span className="relative z-10 text-white">Get Started</span>
-            </button>
-          </div>
+            <Button full onClick={() => handleNavigate('build')}>Explore Pillars</Button>
+          </Container>
         </div>
       )}
     </nav>

@@ -2,12 +2,10 @@ const SITE_URL = 'https://blockwavelab.com';
 const OG_BASE_URL = `${SITE_URL}/og`;
 
 const SERVICE_PATHS = new Set([
-  '/services',
-  '/crypto-kol-marketing',
-  '/token-launch-marketing',
-  '/web3-influencer-marketing',
-  '/telegram-community-growth',
-  '/crypto-pr-marketing',
+  '/build',
+  '/automate',
+  '/operate',
+  '/grow',
 ]);
 
 function toSlug(value) {
@@ -42,7 +40,7 @@ export function getTagOgImageUrl(tag) {
 }
 
 export function getServiceOgImageUrl(route) {
-  const slug = toSlug(route.replace(/^\//, '')) || 'services';
+  const slug = toSlug(route.replace(/^\//, '')) || 'build';
   return buildAbsoluteOgUrl(`services/${slug}.png`);
 }
 
@@ -101,7 +99,7 @@ export function resolveOgImageUrl({ canonical, type, title, tags = [] }) {
 }
 
 export function getOgImageAltText(title) {
-  return title ? `${title} | BlockWaveLab` : 'BlockWaveLab crypto marketing';
+  return title ? `${title} | BlockWaveLab` : 'BlockWaveLab AI automation and DevOps partner';
 }
 
 export { SITE_URL, OG_BASE_URL, toSlug, normalizePath };
