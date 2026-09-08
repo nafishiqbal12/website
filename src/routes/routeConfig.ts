@@ -32,14 +32,6 @@ export const PATH_BY_PAGE: Record<StaticPage, string> = {
   grow: '/grow',
 };
 
-export const ALIAS_ROUTES = {
-  build: ['/services'],
-  automate: ['/ai-blockchain-marketing'],
-  operate: ['/managed-devops'],
-  grow: ['/growth-content-community'],
-  cases: ['/cases', '/case-studies'],
-} as const;
-
 export const TAG_ROUTE_PREFIX = '/blog/tag/';
 export const BLOG_ROUTE_PREFIX = '/blog/';
 export const CASE_STUDIES_PREFIX = '/case-studies/';
@@ -58,9 +50,6 @@ export function resolveNavigationTarget(target: string) {
   }
 
   const aliasByTarget: Record<string, string> = {
-    services: '/build',
-    about: '/operate',
-    contact: '/grow',
     cases: '/case-studies',
   };
 
@@ -99,7 +88,6 @@ export function getRouteFromPath(pathname: string): RouteState {
     case '/':
       return { page: 'home', path: '/' };
     case '/build':
-    case '/services':
       return { page: 'build', path: '/build' };
     case '/automate':
       return { page: 'automate', path: '/automate' };

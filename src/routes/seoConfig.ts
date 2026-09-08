@@ -50,9 +50,9 @@ const SEO_BY_PAGE: Record<StaticPage, SeoConfig> = {
     ogType: 'service',
   },
   grow: {
-    title: 'GROW | Growth, Content and Community for Web3 Projects',
+    title: 'GROW | Technical Growth, Content and Community Systems | BlockWaveLab',
     description:
-      'Align growth execution with delivery readiness through content operations and community workflows built for Web3 teams.',
+      'GROW by BlockWaveLab connects technical growth systems, content operations, community enablement, and delivery readiness for Web3 projects.',
     path: '/grow',
     keywords: TARGET_KEYWORDS,
     ogType: 'service',

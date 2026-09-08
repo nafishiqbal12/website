@@ -5,7 +5,7 @@ import Home from '../pages/V2Home';
 import BuildPage from '../pages/BuildPage';
 import AutomatePage from '../pages/AutomatePage';
 import OperatePage from '../pages/OperatePage';
-import PillarPage from '../pages/PillarPage';
+import GrowPage from '../pages/GrowPage';
 import { getPostBySlug, type Post } from '../lib/blog';
 import { getSeoForRoute } from './seoConfig';
 import {
@@ -256,9 +256,11 @@ export default function AppRouter() {
           'Ongoing AI operations support for deployed automations',
         ],
         grow: [
-          'Growth, content and community operations',
-          'Delivery-aligned growth execution support',
-          'Cross-functional growth and operations feedback loops',
+          'Technical growth systems tied to product and operations readiness',
+          'Content operations for authority and trust',
+          'Community operations and enablement workflows',
+          'Demand support integrated with delivery lifecycle',
+          'Cross-functional feedback loops between growth and operations',
         ],
       };
 
@@ -299,7 +301,7 @@ export default function AppRouter() {
       case 'operate':
         return <OperatePage onNavigate={navigate} />;
       case 'grow':
-        return <PillarPage pillar="grow" onNavigate={navigate} />;
+        return <GrowPage onNavigate={navigate} />;
       case 'cases':
         return <CaseStudies onNavigate={navigate} />;
       case 'case-study':

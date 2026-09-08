@@ -94,9 +94,10 @@ export function mapRelatedServices(caseStudy: CaseStudy): string[] {
   if (caseStudy.relatedServices && caseStudy.relatedServices.length) return caseStudy.relatedServices;
   if (!caseStudy.niche) return [];
   const map: Record<string, string> = {
-    'community': '/telegram-community-growth',
-    'kol': '/kol-marketing',
-    'token-launch': '/token-launch-marketing',
+    'community': '/grow',
+    'automation': '/automate',
+    'operations': '/operate',
+    'infrastructure': '/build',
   };
   const key = caseStudy.niche.toLowerCase();
   return map[key] ? [map[key]] : [];

@@ -8,7 +8,7 @@ interface BlogProps {
 }
 
 export default function Blog({ onNavigate }: BlogProps) {
-  const description = 'Tactical playbooks and how-tos for KOL campaigns, token launches, community growth, and PR in Web3.';
+  const description = 'Practical insights on Web3 infrastructure, workflow automation, technical operations, and delivery-aligned growth.';
   const itemListSchema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -28,29 +28,29 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   return (
     <div className="pt-16">
-      <SEO title="Blog — Crypto Marketing Insights" description={description} canonical="https://blockwavelab.com/blog" />
+      <SEO title="Blog — Web3 DevOps and Automation Insights" description={description} canonical="https://blockwavelab.com/blog" />
       <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-20" aria-label="Blog hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm uppercase tracking-[0.25em] text-blue-100 mb-4">BlockWaveLab Blog</p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6">Crypto Marketing Insights</h1>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6">Web3 Delivery and Automation Insights</h1>
           <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto">
-            Tactical playbooks for KOL campaigns, token launches, community growth, and PR strategies in Web3.
+            Practical notes on infrastructure, AI-assisted workflows, technical operations, and growth systems tied to delivery readiness.
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm">
             <a
-              href="/services"
-              onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'services')}
+              href="/build"
+              onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/build')}
               className="px-4 py-2 rounded-lg bg-white/15 border border-white/20 hover:bg-white/25 transition-colors"
             >
-              Explore Services
+              Explore BUILD
             </a>
             <a
-              href="/contact"
-              onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'contact')}
+              href="/operate"
+              onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/operate')}
               className="px-4 py-2 rounded-lg bg-white text-blue-700 font-semibold hover:shadow-lg transition-all"
             >
-              Book Consultation
+              Discuss your project
             </a>
           </div>
         </div>
@@ -61,9 +61,9 @@ export default function Blog({ onNavigate }: BlogProps) {
           <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
 
           <div className="max-w-3xl mb-10">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Latest Web3 Marketing Articles</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Latest Web3 Delivery Articles</h2>
             <p className="text-lg text-gray-600">
-              Learn practical strategies for crypto KOL marketing, Web3 influencer marketing, launch campaigns, and long-term community growth.
+              Learn practical approaches to cloud foundations, workflow automation, operational readiness, and community enablement.
             </p>
           </div>
 
@@ -107,21 +107,21 @@ export default function Blog({ onNavigate }: BlogProps) {
 
           <div className="mt-16 bg-white rounded-2xl border border-gray-100 p-8 text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Need help applying these strategies?</h3>
-            <p className="text-gray-600 mb-6">Talk to BlockWaveLab for a custom growth plan based on your stage and goals.</p>
+            <p className="text-gray-600 mb-6">Talk to BlockWaveLab about an implementation or ongoing service path based on your project stage and goals.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <a
-                href="/services"
-                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'services')}
+                href="/build"
+                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/build')}
                 className="px-6 py-3 rounded-lg bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors"
               >
-                Explore Services
+                Explore service lanes
               </a>
               <a
-                href="/contact"
-                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'contact')}
+                href="/operate"
+                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/operate')}
                 className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
               >
-                Book Consultation
+                Discuss your project
               </a>
             </div>
           </div>

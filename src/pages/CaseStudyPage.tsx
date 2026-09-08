@@ -64,19 +64,19 @@ export default function CaseStudyPage({ caseStudy, onNavigate }: Props) {
         </section>
 
         <section className="mb-12">
-          <h3 className="font-semibold mb-2">Related Services</h3>
+          <h3 className="font-semibold mb-2">Related Service Categories</h3>
           <div className="flex gap-4">
             {services.map((s) => (
-              <button key={s} onClick={() => onNavigate(s)} className="px-4 py-2 bg-cyan-600 rounded">View Service</button>
+              <button key={s} onClick={() => onNavigate(s)} className="px-4 py-2 bg-cyan-600 rounded">Explore category</button>
             ))}
           </div>
         </section>
 
         <div className="mt-12 p-6 bg-gradient-to-r from-cyan-800 to-purple-800 rounded text-center">
-          <h3 className="text-xl font-bold">Ready to scale like {caseStudy.client}?</h3>
-          <p className="text-slate-200 mt-2">Book a strategy session to review tailored growth playbooks.</p>
+          <h3 className="text-xl font-bold">Review the right BlockWaveLab category</h3>
+          <p className="text-slate-200 mt-2">Use the active service pages to understand the current implementation and operations model.</p>
           <div className="mt-4">
-            <button onClick={() => onNavigate('/contact')} className="px-6 py-3 bg-white text-black rounded font-semibold">Book a Call</button>
+            <button onClick={() => onNavigate('/operate')} className="px-6 py-3 bg-white text-black rounded font-semibold">Explore OPERATE</button>
           </div>
         </div>
       </article>

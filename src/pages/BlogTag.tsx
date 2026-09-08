@@ -9,13 +9,13 @@ interface Props {
 }
 
 const SUPPORTED_TAGS = [
-  'TON',
-  'memecoin',
-  'crypto marketing',
-  'Web3',
-  'Telegram',
-  'token launch',
-  'KOL marketing',
+  'BUILD',
+  'AUTOMATE',
+  'OPERATE',
+  'GROW',
+  'Web3 infrastructure',
+  'workflow automation',
+  'community operations',
 ];
 
 function normaliseTag(t: string) {
@@ -25,7 +25,7 @@ function normaliseTag(t: string) {
 export default function BlogTag({ tag, onNavigate }: Props) {
   const canonical = `https://blockwavelab.com/blog/tag/${encodeURIComponent(tag)}`;
   const title = `${tag} — BlockWaveLab Blog`;
-  const description = `Articles and insights about ${tag} from BlockWaveLab — crypto KOL marketing, token launches, community growth and Web3 strategy.`;
+  const description = `Articles and insights about ${tag} from BlockWaveLab — Web3 infrastructure, automation, operations, and delivery-aligned growth.`;
 
   const handleNav = (e: MouseEvent<HTMLAnchorElement>, t: string) => {
     e.preventDefault();
@@ -65,7 +65,7 @@ export default function BlogTag({ tag, onNavigate }: Props) {
       <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-12" aria-label="Tag header">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold">Tag: {tag}</h1>
-          <p className="mt-2 text-blue-100 max-w-2xl mx-auto">{`Curated posts and insights about ${tag} — filtered for relevance to crypto startups, memecoin founders and Web3 teams.`}</p>
+          <p className="mt-2 text-blue-100 max-w-2xl mx-auto">{`Curated posts and insights about ${tag} — filtered for relevance to Web3 teams and technical delivery.`}</p>
         </div>
       </section>
 
@@ -137,8 +137,8 @@ export default function BlogTag({ tag, onNavigate }: Props) {
               <div className="mt-6">
                 <h5 className="font-semibold mb-2">Related pages</h5>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="/services" onClick={(e) => handleNav(e, 'services')} className="text-blue-600">Our Services</a></li>
-                  <li><a href="/contact" onClick={(e) => handleNav(e, 'contact')} className="text-blue-600">Contact Us</a></li>
+                  <li><a href="/build" onClick={(e) => handleNav(e, '/build')} className="text-blue-600">BUILD</a></li>
+                  <li><a href="/operate" onClick={(e) => handleNav(e, '/operate')} className="text-blue-600">OPERATE</a></li>
                   <li><a href="/case-studies" onClick={(e) => handleNav(e, 'cases')} className="text-blue-600">Case Studies</a></li>
                 </ul>
               </div>

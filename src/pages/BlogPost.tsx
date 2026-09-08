@@ -109,22 +109,22 @@ export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
           <div className="mt-12 p-7 rounded-2xl bg-gray-50 border border-gray-100">
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Apply this to your project</h2>
             <p className="text-gray-600 mb-5">
-              If you want a custom growth strategy for your token or protocol, our team can help map the right creator, community, and PR mix.
+              If you want to apply these ideas to your project, our team can help map the right implementation, automation, operations, or growth path.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href="/services"
-                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'services')}
+                href="/build"
+                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/build')}
                 className="px-6 py-3 rounded-lg bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors"
               >
-                View Services
+                Explore BUILD
               </a>
               <a
-                href="/contact"
-                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'contact')}
+                href="/operate"
+                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/operate')}
                 className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
               >
-                Book Marketing Consultation
+                Discuss your project
               </a>
             </div>
           </div>
