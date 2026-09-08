@@ -1,6 +1,6 @@
 import { getOgImageAltText, resolveOgImageUrl } from '../assets/og/routes';
 import type { Post } from '../lib/blog';
-import { SITE_URL, TARGET_KEYWORDS, type RouteState, type StaticPage } from './routeConfig';
+import { SITE_URL, TARGET_KEYWORDS, type AuthPage, type RouteState, type StaticPage } from './routeConfig';
 
 export type SeoConfig = {
   title: string;
@@ -8,6 +8,7 @@ export type SeoConfig = {
   path: string;
   keywords: string;
   ogType?: 'website' | 'article' | 'service';
+  noIndex?: boolean;
 };
 
 export type SeoResolution = {
@@ -74,6 +75,14 @@ const SEO_BY_DYNAMIC_PAGE: Record<'cases' | 'blog', SeoConfig> = {
     path: '/blog',
     keywords: TARGET_KEYWORDS,
   },
+};
+
+const SEO_BY_AUTH_PAGE: Record<AuthPage, SeoConfig> = {
+  login: { title: 'Sign In | BlockWaveLab', description: 'Sign in to your BlockWaveLab identity profile.', path: '/login', keywords: TARGET_KEYWORDS, noIndex: true },
+  signup: { title: 'Create Account | BlockWaveLab', description: 'Create a BlockWaveLab identity profile.', path: '/signup', keywords: TARGET_KEYWORDS, noIndex: true },
+  'forgot-password': { title: 'Reset Password | BlockWaveLab', description: 'Request a secure BlockWaveLab password reset link.', path: '/forgot-password', keywords: TARGET_KEYWORDS, noIndex: true },
+  'reset-password': { title: 'Set New Password | BlockWaveLab', description: 'Set a new password for your BlockWaveLab identity profile.', path: '/reset-password', keywords: TARGET_KEYWORDS, noIndex: true },
+  profile: { title: 'Profile | BlockWaveLab', description: 'Manage your BlockWaveLab identity profile.', path: '/profile', keywords: TARGET_KEYWORDS, noIndex: true },
 };
 
 function buildSeoResolution(seo: SeoConfig, ogInput: { canonical: string; type?: 'website' | 'article' | 'service'; title?: string; tags?: string[] }): SeoResolution {
@@ -165,6 +174,15 @@ export function getSeoForRoute(route: RouteState, currentBlogPost?: Post, curren
     });
   }
 
+  if (route.page in SEO_BY_AUTH_PAGE) {
+    const seo = SEO_BY_AUTH_PAGE[route.page as AuthPage];
+    return buildSeoResolution(seo, {
+      canonical: `${SITE_URL}${seo.path}`,
+      type: 'website',
+      title: seo.title,
+    });
+  }
+
   const seo = SEO_BY_PAGE[route.page as StaticPage] ?? SEO_BY_PAGE.home;
   return buildSeoResolution(seo, {
     canonical: `${SITE_URL}${seo.path}`,
@@ -173,4 +191,4 @@ export function getSeoForRoute(route: RouteState, currentBlogPost?: Post, curren
   });
 }
 
-export { SEO_BY_PAGE, SEO_BY_DYNAMIC_PAGE };
+export { SEO_BY_PAGE, SEO_BY_DYNAMIC_PAGE, SEO_BY_AUTH_PAGE };

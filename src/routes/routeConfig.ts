@@ -16,7 +16,9 @@ export type DynamicPage =
   | 'blog-tag'
   | 'case-study';
 
-export type PageKey = StaticPage | DynamicPage;
+export type AuthPage = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'profile';
+
+export type PageKey = StaticPage | DynamicPage | AuthPage;
 
 export type RouteState = {
   page: PageKey;
@@ -100,6 +102,16 @@ export function getRouteFromPath(pathname: string): RouteState {
       return { page: 'cases', path: '/case-studies' };
     case '/blog':
       return { page: 'blog', path: '/blog' };
+    case '/login':
+      return { page: 'login', path: '/login' };
+    case '/signup':
+      return { page: 'signup', path: '/signup' };
+    case '/forgot-password':
+      return { page: 'forgot-password', path: '/forgot-password' };
+    case '/reset-password':
+      return { page: 'reset-password', path: '/reset-password' };
+    case '/profile':
+      return { page: 'profile', path: '/profile' };
     default:
       return { page: 'home', path: '/' };
   }
@@ -114,6 +126,12 @@ export function getNavPage(routePage: PageKey): StaticPage {
     case 'cases':
     case 'case-study':
       return 'operate';
+    case 'login':
+    case 'signup':
+    case 'forgot-password':
+    case 'reset-password':
+    case 'profile':
+      return 'home';
     default:
       return routePage as StaticPage;
   }

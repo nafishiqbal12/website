@@ -6,6 +6,7 @@ import BuildPage from '../pages/BuildPage';
 import AutomatePage from '../pages/AutomatePage';
 import OperatePage from '../pages/OperatePage';
 import GrowPage from '../pages/GrowPage';
+import { ForgotPasswordPage, LoginPage, ProfilePage, ResetPasswordPage, SignupPage } from '../pages/AuthPages';
 import { getPostBySlug, type Post } from '../lib/blog';
 import { getSeoForRoute } from './seoConfig';
 import {
@@ -113,6 +114,7 @@ export default function AppRouter() {
     document.title = seo.title;
     upsertMeta('meta[name="description"]', 'name', 'description', seo.description);
     upsertMeta('meta[name="keywords"]', 'name', 'keywords', seo.keywords);
+    upsertMeta('meta[name="robots"]', 'name', 'robots', seo.noIndex ? 'noindex, nofollow' : 'index, follow');
 
     upsertMeta('meta[property="og:title"]', 'property', 'og:title', seo.title);
     upsertMeta('meta[property="og:description"]', 'property', 'og:description', seo.description);
@@ -302,6 +304,16 @@ export default function AppRouter() {
         return <OperatePage onNavigate={navigate} />;
       case 'grow':
         return <GrowPage onNavigate={navigate} />;
+      case 'login':
+        return <LoginPage onNavigate={navigate} />;
+      case 'signup':
+        return <SignupPage onNavigate={navigate} />;
+      case 'forgot-password':
+        return <ForgotPasswordPage onNavigate={navigate} />;
+      case 'reset-password':
+        return <ResetPasswordPage onNavigate={navigate} />;
+      case 'profile':
+        return <ProfilePage onNavigate={navigate} />;
       case 'cases':
         return <CaseStudies onNavigate={navigate} />;
       case 'case-study':
