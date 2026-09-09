@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -25,7 +26,7 @@ let configuredClient: SupabaseClient | null = null;
 
 if (supabaseConfiguration.isConfigured) {
   try {
-    configuredClient = createClient(supabaseConfiguration.url, supabaseConfiguration.anonKey, {
+    configuredClient = createBrowserClient(supabaseConfiguration.url, supabaseConfiguration.anonKey, {
       auth: {
         flowType: 'pkce',
         persistSession: true,

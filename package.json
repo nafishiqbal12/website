@@ -14,17 +14,18 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4",
-    "sharp": "^0.33.5",
-    "lucide-react": "^0.344.0",
-    "react-helmet-async": "^2.0.5",
     "@mdx-js/react": "^2.3.0",
     "@mdx-js/rollup": "^3.1.1",
-    "reading-time": "^1.4.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
     "gray-matter": "^4.0.3",
-    "rehype-highlight": "^6.0.0",
+    "lucide-react": "^0.344.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.5",
+    "reading-time": "^1.4.0",
+    "rehype-highlight": "^6.0.0",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
