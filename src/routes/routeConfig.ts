@@ -18,12 +18,15 @@ export type DynamicPage =
 
 export type AuthPage = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'profile';
 
-export type PageKey = StaticPage | DynamicPage | AuthPage;
+export type AppPage = 'dashboard' | 'organizations' | 'organization' | 'organization-members' | 'organization-invitations' | 'projects' | 'project' | 'project-members';
+
+export type PageKey = StaticPage | DynamicPage | AuthPage | AppPage;
 
 export type RouteState = {
   page: PageKey;
   path: string;
   slug?: string;
+  resourceId?: string;
 };
 
 export const PATH_BY_PAGE: Record<StaticPage, string> = {
@@ -64,6 +67,26 @@ export function resolveNavigationTarget(target: string) {
 
 export function getRouteFromPath(pathname: string): RouteState {
   const normalized = normalizePath(pathname);
+
+  const organizationMatch = normalized.match(/^\/organizations\/([^/]+)(?:\/(members|invitations))?$/);
+  if (organizationMatch) {
+    const [, organizationId, section] = organizationMatch;
+    return {
+      page: section === 'members' ? 'organization-members' : section === 'invitations' ? 'organization-invitations' : 'organization',
+      path: normalized,
+      resourceId: organizationId,
+    };
+  }
+
+  const projectMatch = normalized.match(/^\/projects\/([^/]+)(?:\/members)?$/);
+  if (projectMatch) {
+    const [, projectId] = projectMatch;
+    return {
+      page: normalized.endsWith('/members') ? 'project-members' : 'project',
+      path: normalized,
+      resourceId: projectId,
+    };
+  }
 
   if (normalized.startsWith(TAG_ROUTE_PREFIX)) {
     const tag = normalized.slice(TAG_ROUTE_PREFIX.length).trim();
@@ -112,6 +135,12 @@ export function getRouteFromPath(pathname: string): RouteState {
       return { page: 'reset-password', path: '/reset-password' };
     case '/profile':
       return { page: 'profile', path: '/profile' };
+    case '/dashboard':
+      return { page: 'dashboard', path: '/dashboard' };
+    case '/organizations':
+      return { page: 'organizations', path: '/organizations' };
+    case '/projects':
+      return { page: 'projects', path: '/projects' };
     default:
       return { page: 'home', path: '/' };
   }
@@ -131,6 +160,15 @@ export function getNavPage(routePage: PageKey): StaticPage {
     case 'forgot-password':
     case 'reset-password':
     case 'profile':
+      return 'home';
+    case 'dashboard':
+    case 'organizations':
+    case 'organization':
+    case 'organization-members':
+    case 'organization-invitations':
+    case 'projects':
+    case 'project':
+    case 'project-members':
       return 'home';
     default:
       return routePage as StaticPage;

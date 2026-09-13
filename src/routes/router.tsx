@@ -6,7 +6,8 @@ import BuildPage from '../pages/BuildPage';
 import AutomatePage from '../pages/AutomatePage';
 import OperatePage from '../pages/OperatePage';
 import GrowPage from '../pages/GrowPage';
-import { ForgotPasswordPage, LoginPage, ProfilePage, ResetPasswordPage, SignupPage } from '../pages/AuthPages';
+import { ForgotPasswordPage, LoginPage, ResetPasswordPage, SignupPage } from '../pages/AuthPages';
+import PlatformApp from '../pages/platform/PlatformApp';
 import { getPostBySlug, type Post } from '../lib/blog';
 import { getSeoForRoute } from './seoConfig';
 import {
@@ -313,7 +314,15 @@ export default function AppRouter() {
       case 'reset-password':
         return <ResetPasswordPage onNavigate={navigate} />;
       case 'profile':
-        return <ProfilePage onNavigate={navigate} />;
+      case 'dashboard':
+      case 'organizations':
+      case 'organization':
+      case 'organization-members':
+      case 'organization-invitations':
+      case 'projects':
+      case 'project':
+      case 'project-members':
+        return <PlatformApp route={route} onNavigate={navigate} />;
       case 'cases':
         return <CaseStudies onNavigate={navigate} />;
       case 'case-study':
