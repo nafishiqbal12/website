@@ -18,7 +18,7 @@ export type DynamicPage =
 
 export type AuthPage = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'profile';
 
-export type AppPage = 'dashboard' | 'organizations' | 'organization' | 'organization-members' | 'organization-invitations' | 'projects' | 'project' | 'project-members';
+export type AppPage = 'dashboard' | 'organizations' | 'organization' | 'organization-members' | 'organization-invitations' | 'projects' | 'project' | 'project-members' | 'proposals' | 'proposal' | 'agreements' | 'agreement';
 
 export type PageKey = StaticPage | DynamicPage | AuthPage | AppPage;
 
@@ -85,6 +85,24 @@ export function getRouteFromPath(pathname: string): RouteState {
       page: normalized.endsWith('/members') ? 'project-members' : 'project',
       path: normalized,
       resourceId: projectId,
+    };
+  }
+
+  const proposalMatch = normalized.match(/^\/proposals(?:\/([^/]+))?$/);
+  if (proposalMatch) {
+    return {
+      page: proposalMatch[1] ? 'proposal' : 'proposals',
+      path: normalized,
+      resourceId: proposalMatch[1],
+    };
+  }
+
+  const agreementMatch = normalized.match(/^\/agreements(?:\/([^/]+))?$/);
+  if (agreementMatch) {
+    return {
+      page: agreementMatch[1] ? 'agreement' : 'agreements',
+      path: normalized,
+      resourceId: agreementMatch[1],
     };
   }
 
@@ -169,6 +187,10 @@ export function getNavPage(routePage: PageKey): StaticPage {
     case 'projects':
     case 'project':
     case 'project-members':
+    case 'proposals':
+    case 'proposal':
+    case 'agreements':
+    case 'agreement':
       return 'home';
     default:
       return routePage as StaticPage;

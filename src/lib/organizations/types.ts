@@ -145,3 +145,95 @@ export type ProjectService = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type ProposalStatus = 'DRAFT' | 'INTERNAL_REVIEW' | 'SENT' | 'VIEWED' | 'CHANGES_REQUESTED' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'CANCELLED';
+
+export type Proposal = {
+  id: string;
+  organizationId: string;
+  projectId: string | null;
+  status: ProposalStatus;
+  createdBy: string;
+  issuedAt: string | null;
+  validUntil: string | null;
+  currentVersionId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ProposalVersion = {
+  id: string;
+  proposalId: string;
+  versionNumber: number;
+  supersedesVersionId: string | null;
+  status: ProposalStatus;
+  scopeSnapshot: Record<string, unknown>;
+  commercialSnapshot: Record<string, unknown>;
+  currency: 'USD';
+  contentChecksum: string;
+  issuedAt: string | null;
+  validUntil: string | null;
+  createdBy: string;
+  createdAt: string;
+};
+
+export type ProposalItem = {
+  id: string;
+  proposalVersionId: string;
+  projectId: string | null;
+  projectServiceId: string | null;
+  offeringId: string | null;
+  pillarCode: CatalogPillarCode;
+  serviceCode: string;
+  serviceName: string;
+  offeringName: string;
+  scopeSnapshot: Record<string, unknown>;
+  commercialSnapshot: Record<string, unknown>;
+  quantity: number | null;
+  unit: string | null;
+  sortOrder: number;
+  createdAt: string;
+};
+
+export type AgreementStatus = 'DRAFT' | 'PENDING_ACCEPTANCE' | 'ACTIVE' | 'SUSPENDED' | 'TERMINATED' | 'EXPIRED';
+
+export type Agreement = {
+  id: string;
+  organizationId: string;
+  projectId: string | null;
+  proposalId: string | null;
+  sourceProposalVersionId: string | null;
+  status: AgreementStatus;
+  createdBy: string;
+  effectiveAt: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AgreementVersion = {
+  id: string;
+  agreementId: string;
+  versionNumber: number;
+  supersedesVersionId: string | null;
+  status: AgreementStatus;
+  termsSnapshot: Record<string, unknown>;
+  contentChecksum: string;
+  effectiveAt: string | null;
+  expiresAt: string | null;
+  createdBy: string;
+  createdAt: string;
+};
+
+export type AgreementAcceptance = {
+  id: string;
+  agreementId: string;
+  agreementVersionId: string;
+  organizationId: string;
+  acceptingUserId: string;
+  acceptedAt: string;
+  acceptedVersionNumber: number;
+  contentChecksum: string;
+  idempotencyKey: string;
+  createdAt: string;
+};

@@ -322,6 +322,10 @@ export default function AppRouter() {
       case 'projects':
       case 'project':
       case 'project-members':
+      case 'proposals':
+      case 'proposal':
+      case 'agreements':
+      case 'agreement':
         return <PlatformApp route={route} onNavigate={navigate} />;
       case 'cases':
         return <CaseStudies onNavigate={navigate} />;

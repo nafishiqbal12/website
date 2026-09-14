@@ -16,6 +16,14 @@ import type {
   ProjectMembership,
   ProjectMembershipStatus,
   ProjectRole,
+  Proposal,
+  ProposalItem,
+  ProposalStatus,
+  ProposalVersion,
+  Agreement,
+  AgreementAcceptance,
+  AgreementStatus,
+  AgreementVersion,
 } from './types';
 
 const configurationError = () => new Error('Supabase is not configured in this environment.');
@@ -130,6 +138,94 @@ type ProjectServiceRow = {
   updated_at: string;
 };
 
+type ProposalRow = {
+  id: string;
+  organization_id: string;
+  project_id: string | null;
+  status: ProposalStatus;
+  created_by: string;
+  issued_at: string | null;
+  valid_until: string | null;
+  current_version_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type ProposalVersionRow = {
+  id: string;
+  proposal_id: string;
+  version_number: number;
+  supersedes_version_id: string | null;
+  status: ProposalStatus;
+  scope_snapshot: Record<string, unknown>;
+  commercial_snapshot: Record<string, unknown>;
+  currency: 'USD';
+  content_checksum: string;
+  issued_at: string | null;
+  valid_until: string | null;
+  created_by: string;
+  created_at: string;
+};
+
+type ProposalItemRow = {
+  id: string;
+  proposal_version_id: string;
+  project_id: string | null;
+  project_service_id: string | null;
+  offering_id: string | null;
+  pillar_code: CatalogPillarCode;
+  service_code: string;
+  service_name: string;
+  offering_name: string;
+  scope_snapshot: Record<string, unknown>;
+  commercial_snapshot: Record<string, unknown>;
+  quantity: number | null;
+  unit: string | null;
+  sort_order: number;
+  created_at: string;
+};
+
+type AgreementRow = {
+  id: string;
+  organization_id: string;
+  project_id: string | null;
+  proposal_id: string | null;
+  source_proposal_version_id: string | null;
+  status: AgreementStatus;
+  created_by: string;
+  effective_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type AgreementVersionRow = {
+  id: string;
+  agreement_id: string;
+  version_number: number;
+  supersedes_version_id: string | null;
+  status: AgreementStatus;
+  terms_snapshot: Record<string, unknown>;
+  content_checksum: string;
+  effective_at: string | null;
+  expires_at: string | null;
+  created_by: string;
+  created_at: string;
+};
+
+type AgreementAcceptanceRow = {
+  id: string;
+  agreement_id: string;
+  agreement_version_id: string;
+  organization_id: string;
+  accepting_user_id: string;
+  accepted_at: string;
+  accepted_version_number: number;
+  content_checksum: string;
+  idempotency_key: string;
+  created_at: string;
+};
+
 function mapOrganization(row: OrganizationRow): Organization {
   return {
     id: row.id,
@@ -215,6 +311,30 @@ function mapServiceOffering(row: ServiceOfferingRow): ServiceOffering {
 
 function mapProjectService(row: ProjectServiceRow): ProjectService {
   return { id: row.id, projectId: row.project_id, offeringId: row.offering_id, status: row.status, requestedScope: row.requested_scope, scopeSnapshot: row.scope_snapshot, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at };
+}
+
+function mapProposal(row: ProposalRow): Proposal {
+  return { id: row.id, organizationId: row.organization_id, projectId: row.project_id, status: row.status, createdBy: row.created_by, issuedAt: row.issued_at, validUntil: row.valid_until, currentVersionId: row.current_version_id, createdAt: row.created_at, updatedAt: row.updated_at };
+}
+
+function mapProposalVersion(row: ProposalVersionRow): ProposalVersion {
+  return { id: row.id, proposalId: row.proposal_id, versionNumber: row.version_number, supersedesVersionId: row.supersedes_version_id, status: row.status, scopeSnapshot: row.scope_snapshot, commercialSnapshot: row.commercial_snapshot, currency: row.currency, contentChecksum: row.content_checksum, issuedAt: row.issued_at, validUntil: row.valid_until, createdBy: row.created_by, createdAt: row.created_at };
+}
+
+function mapProposalItem(row: ProposalItemRow): ProposalItem {
+  return { id: row.id, proposalVersionId: row.proposal_version_id, projectId: row.project_id, projectServiceId: row.project_service_id, offeringId: row.offering_id, pillarCode: row.pillar_code, serviceCode: row.service_code, serviceName: row.service_name, offeringName: row.offering_name, scopeSnapshot: row.scope_snapshot, commercialSnapshot: row.commercial_snapshot, quantity: row.quantity, unit: row.unit, sortOrder: row.sort_order, createdAt: row.created_at };
+}
+
+function mapAgreement(row: AgreementRow): Agreement {
+  return { id: row.id, organizationId: row.organization_id, projectId: row.project_id, proposalId: row.proposal_id, sourceProposalVersionId: row.source_proposal_version_id, status: row.status, createdBy: row.created_by, effectiveAt: row.effective_at, expiresAt: row.expires_at, createdAt: row.created_at, updatedAt: row.updated_at };
+}
+
+function mapAgreementVersion(row: AgreementVersionRow): AgreementVersion {
+  return { id: row.id, agreementId: row.agreement_id, versionNumber: row.version_number, supersedesVersionId: row.supersedes_version_id, status: row.status, termsSnapshot: row.terms_snapshot, contentChecksum: row.content_checksum, effectiveAt: row.effective_at, expiresAt: row.expires_at, createdBy: row.created_by, createdAt: row.created_at };
+}
+
+function mapAgreementAcceptance(row: AgreementAcceptanceRow): AgreementAcceptance {
+  return { id: row.id, agreementId: row.agreement_id, agreementVersionId: row.agreement_version_id, organizationId: row.organization_id, acceptingUserId: row.accepting_user_id, acceptedAt: row.accepted_at, acceptedVersionNumber: row.accepted_version_number, contentChecksum: row.content_checksum, idempotencyKey: row.idempotency_key, createdAt: row.created_at };
 }
 
 export async function listOrganizations(): Promise<{ organizations: Organization[]; error: Error | null }> {
@@ -402,4 +522,80 @@ export async function selectProjectService(input: { projectId: string; offeringI
     p_requested_scope: input.requestedScope ?? {},
   });
   return { service: data ? mapProjectService(data as ProjectServiceRow) : null, error };
+}
+
+export async function listProposals(organizationId: string, projectId?: string): Promise<{ proposals: Proposal[]; error: Error | null }> {
+  if (!supabase) return { proposals: [], error: configurationError() };
+  let query = supabase.from('proposals').select('*').eq('organization_id', organizationId).order('created_at', { ascending: false });
+  if (projectId) query = query.eq('project_id', projectId);
+  const { data, error } = await query;
+  return { proposals: ((data ?? []) as ProposalRow[]).map(mapProposal), error };
+}
+
+export async function listProposalVersions(proposalId: string): Promise<{ versions: ProposalVersion[]; error: Error | null }> {
+  if (!supabase) return { versions: [], error: configurationError() };
+  const { data, error } = await supabase.from('proposal_versions').select('*').eq('proposal_id', proposalId).order('version_number', { ascending: false });
+  return { versions: ((data ?? []) as ProposalVersionRow[]).map(mapProposalVersion), error };
+}
+
+export async function listProposalItems(versionId: string): Promise<{ items: ProposalItem[]; error: Error | null }> {
+  if (!supabase) return { items: [], error: configurationError() };
+  const { data, error } = await supabase.from('proposal_items').select('*').eq('proposal_version_id', versionId).order('sort_order');
+  return { items: ((data ?? []) as ProposalItemRow[]).map(mapProposalItem), error };
+}
+
+export async function createProposal(input: { organizationId: string; projectId?: string | null; validUntil?: string | null }): Promise<{ proposal: Proposal | null; error: Error | null }> {
+  if (!supabase) return { proposal: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('create_proposal', { p_organization_id: input.organizationId, p_project_id: input.projectId ?? null, p_valid_until: input.validUntil ?? null });
+  return { proposal: data ? mapProposal(data as ProposalRow) : null, error };
+}
+
+export async function createProposalVersion(input: { proposalId: string; scopeSnapshot?: Record<string, unknown>; commercialSnapshot?: Record<string, unknown>; contentChecksum: string; items?: Record<string, unknown>[]; validUntil?: string | null }): Promise<{ version: ProposalVersion | null; error: Error | null }> {
+  if (!supabase) return { version: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('create_proposal_version', { p_proposal_id: input.proposalId, p_scope_snapshot: input.scopeSnapshot ?? {}, p_commercial_snapshot: input.commercialSnapshot ?? {}, p_content_checksum: input.contentChecksum, p_items: input.items ?? [], p_valid_until: input.validUntil ?? null });
+  return { version: data ? mapProposalVersion(data as ProposalVersionRow) : null, error };
+}
+
+export async function issueProposal(proposalId: string, expectedVersion: number): Promise<{ proposal: Proposal | null; error: Error | null }> {
+  if (!supabase) return { proposal: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('issue_proposal', { p_proposal_id: proposalId, p_expected_version: expectedVersion });
+  return { proposal: data ? mapProposal(data as ProposalRow) : null, error };
+}
+
+export async function acceptProposal(proposalId: string, expectedVersion: number): Promise<{ proposal: Proposal | null; error: Error | null }> {
+  if (!supabase) return { proposal: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('accept_proposal', { p_proposal_id: proposalId, p_expected_version: expectedVersion });
+  return { proposal: data ? mapProposal(data as ProposalRow) : null, error };
+}
+
+export async function listAgreements(organizationId: string, projectId?: string): Promise<{ agreements: Agreement[]; error: Error | null }> {
+  if (!supabase) return { agreements: [], error: configurationError() };
+  let query = supabase.from('agreements').select('*').eq('organization_id', organizationId).order('created_at', { ascending: false });
+  if (projectId) query = query.eq('project_id', projectId);
+  const { data, error } = await query;
+  return { agreements: ((data ?? []) as AgreementRow[]).map(mapAgreement), error };
+}
+
+export async function listAgreementVersions(agreementId: string): Promise<{ versions: AgreementVersion[]; error: Error | null }> {
+  if (!supabase) return { versions: [], error: configurationError() };
+  const { data, error } = await supabase.from('agreement_versions').select('*').eq('agreement_id', agreementId).order('version_number', { ascending: false });
+  return { versions: ((data ?? []) as AgreementVersionRow[]).map(mapAgreementVersion), error };
+}
+
+export async function createAgreement(input: { organizationId: string; projectId?: string | null; proposalId?: string | null; sourceProposalVersionId?: string | null; termsSnapshot?: Record<string, unknown>; contentChecksum?: string }): Promise<{ agreement: Agreement | null; error: Error | null }> {
+  if (!supabase) return { agreement: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('create_agreement', { p_organization_id: input.organizationId, p_project_id: input.projectId ?? null, p_proposal_id: input.proposalId ?? null, p_source_proposal_version_id: input.sourceProposalVersionId ?? null, p_terms_snapshot: input.termsSnapshot ?? {}, p_content_checksum: input.contentChecksum ?? 'pending-terms-review' });
+  return { agreement: data ? mapAgreement(data as AgreementRow) : null, error };
+}
+
+export async function createAgreementVersion(input: { agreementId: string; termsSnapshot?: Record<string, unknown>; contentChecksum: string; effectiveAt?: string | null; expiresAt?: string | null }): Promise<{ version: AgreementVersion | null; error: Error | null }> {
+  if (!supabase) return { version: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('create_agreement_version', { p_agreement_id: input.agreementId, p_terms_snapshot: input.termsSnapshot ?? {}, p_content_checksum: input.contentChecksum, p_effective_at: input.effectiveAt ?? null, p_expires_at: input.expiresAt ?? null });
+  return { version: data ? mapAgreementVersion(data as AgreementVersionRow) : null, error };
+}
+
+export async function acceptAgreement(input: { agreementId: string; agreementVersionId: string; idempotencyKey: string }): Promise<{ acceptance: AgreementAcceptance | null; error: Error | null }> {
+  if (!supabase) return { acceptance: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('accept_agreement', { p_agreement_id: input.agreementId, p_agreement_version_id: input.agreementVersionId, p_idempotency_key: input.idempotencyKey });
+  return { acceptance: data ? mapAgreementAcceptance(data as AgreementAcceptanceRow) : null, error };
 }

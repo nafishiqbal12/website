@@ -99,7 +99,7 @@ function buildSeoResolution(seo: SeoConfig, ogInput: { canonical: string; type?:
 import type { CaseStudy } from '../lib/caseStudies';
 
 export function getSeoForRoute(route: RouteState, currentBlogPost?: Post, currentCaseStudy?: CaseStudy): SeoResolution {
-  if (['dashboard', 'organizations', 'organization', 'organization-members', 'organization-invitations', 'projects', 'project', 'project-members'].includes(route.page)) {
+  if (['dashboard', 'organizations', 'organization', 'organization-members', 'organization-invitations', 'projects', 'project', 'project-members', 'proposals', 'proposal', 'agreements', 'agreement'].includes(route.page)) {
     const seo = {
       title: 'Client Platform | BlockWaveLab',
       description: 'Authenticated BlockWaveLab client platform workspace.',
