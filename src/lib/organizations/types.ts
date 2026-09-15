@@ -237,3 +237,252 @@ export type AgreementAcceptance = {
   idempotencyKey: string;
   createdAt: string;
 };
+
+export type PaymentObligationStatus = 'PENDING' | 'CANCELLED' | 'EXPIRED';
+
+export type PaymentPurpose = 'IMPLEMENTATION' | 'ONGOING_SERVICE';
+
+export type PaymentScheduleType = 'UPFRONT' | 'DEPOSIT' | 'MILESTONE' | 'RECURRING';
+
+export type PaymentObligation = {
+  id: string;
+  organizationId: string;
+  projectId: string | null;
+  proposalId: string;
+  proposalVersionId: string;
+  agreementId: string | null;
+  agreementVersionId: string | null;
+  paymentPurpose: PaymentPurpose;
+  scheduleType: PaymentScheduleType;
+  amountMinor: string;
+  currency: 'USD';
+  dueAt: string | null;
+  expiresAt: string | null;
+  status: PaymentObligationStatus;
+  commercialSnapshot: Record<string, unknown>;
+  scheduleSnapshot: Record<string, unknown>;
+  idempotencyKey: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PaymentAttemptStatus = 'CREATED' | 'PROCESSING' | 'FAILED' | 'CANCELLED' | 'EXPIRED';
+
+export type PaymentAttempt = {
+  id: string;
+  organizationId: string;
+  projectId: string | null;
+  paymentObligationId: string;
+  amountMinor: string;
+  currency: 'USD';
+  status: PaymentAttemptStatus;
+  commercialSnapshot: Record<string, unknown>;
+  statusReason: string | null;
+  idempotencyKey: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type EntitlementStatus = 'PENDING' | 'ACTIVE' | 'PAUSED' | 'EXPIRED' | 'CANCELLED';
+
+export type Entitlement = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  paymentObligationId: string;
+  proposalId: string;
+  proposalVersionId: string;
+  agreementId: string | null;
+  agreementVersionId: string | null;
+  sourceType: 'VERIFIED_COMMERCIAL_EVENT';
+  status: EntitlementStatus;
+  startsAt: string;
+  endsAt: string | null;
+  scopeSnapshot: Record<string, unknown>;
+  sourceSnapshot: Record<string, unknown>;
+  activationReference: string;
+  statusReason: string | null;
+  idempotencyKey: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeliveryActivationStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export type DeliveryStage = 'IMPLEMENTATION' | 'DEPLOYMENT' | 'OBSERVATION' | 'STABILIZATION' | 'DOCUMENTATION' | 'HANDOVER' | 'ONGOING_SERVICE';
+
+export type DeliveryActivation = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  entitlementId: string;
+  status: DeliveryActivationStatus;
+  deliveryStage: DeliveryStage;
+  activationSnapshot: Record<string, unknown>;
+  activationReference: string;
+  statusReason: string | null;
+  idempotencyKey: string;
+  activatedAt: string;
+  completedAt: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ImplementationStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export type ImplementationRecord = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  deliveryActivationId: string;
+  entitlementId: string;
+  status: ImplementationStatus;
+  implementationReference: string;
+  scopeSnapshot: Record<string, unknown>;
+  sourceSnapshot: Record<string, unknown>;
+  idempotencyKey: string;
+  statusReason: string | null;
+  startedAt: string;
+  pausedAt: string | null;
+  completedAt: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeploymentStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export type DeploymentRecord = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  implementationRecordId: string;
+  deliveryActivationId: string;
+  entitlementId: string;
+  deploymentReference: string;
+  idempotencyKey: string;
+  deploymentSnapshot: Record<string, unknown>;
+  status: DeploymentStatus;
+  startedAt: string;
+  pausedAt: string | null;
+  completedAt: string | null;
+  statusReason: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ObservationStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export type ObservationRecord = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  entitlementId: string;
+  deliveryActivationId: string;
+  implementationRecordId: string;
+  deploymentRecordId: string;
+  observationReference: string;
+  idempotencyKey: string;
+  observationSnapshot: Record<string, unknown>;
+  status: ObservationStatus;
+  startedAt: string;
+  pausedAt: string | null;
+  completedAt: string | null;
+  statusReason: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StabilizationStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export type StabilizationRecord = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  observationRecordId: string;
+  deploymentRecordId: string;
+  implementationRecordId: string;
+  deliveryActivationId: string;
+  entitlementId: string;
+  stabilizationReference: string;
+  idempotencyKey: string;
+  stabilizationSnapshot: Record<string, unknown>;
+  status: StabilizationStatus;
+  startedAt: string;
+  pausedAt: string | null;
+  completedAt: string | null;
+  statusReason: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type HandoverStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export type HandoverRecord = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  documentationRecordId: string;
+  stabilizationRecordId: string;
+  observationRecordId: string;
+  deploymentRecordId: string;
+  implementationRecordId: string;
+  deliveryActivationId: string;
+  entitlementId: string;
+  handoverReference: string;
+  idempotencyKey: string;
+  handoverScopeSnapshot: Record<string, unknown>;
+  status: HandoverStatus;
+  startedAt: string;
+  completedAt: string | null;
+  statusReason: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OngoingServiceStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export type OngoingServiceBillingMode = 'MONTHLY' | 'ANNUAL';
+
+export type OngoingServiceRecord = {
+  id: string;
+  organizationId: string;
+  projectId: string;
+  projectServiceId: string;
+  handoverRecordId: string;
+  documentationRecordId: string;
+  stabilizationRecordId: string;
+  observationRecordId: string;
+  deploymentRecordId: string;
+  implementationRecordId: string;
+  deliveryActivationId: string;
+  entitlementId: string;
+  ongoingServiceReference: string;
+  idempotencyKey: string;
+  serviceScopeSnapshot: Record<string, unknown>;
+  billingMode: OngoingServiceBillingMode;
+  status: OngoingServiceStatus;
+  startedAt: string;
+  pausedAt: string | null;
+  completedAt: string | null;
+  cancelledAt: string | null;
+  statusReason: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};

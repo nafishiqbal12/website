@@ -29,6 +29,7 @@ import {
   getProject,
   acceptAgreement,
   acceptProposal,
+  cancelPaymentObligation,
   issueProposal,
   listCatalogPillars,
   listCatalogServices,
@@ -43,6 +44,16 @@ import {
   listProposalItems,
   listProposalVersions,
   listProposals,
+  listPaymentObligations,
+  listPaymentAttempts,
+  listProjectEntitlements,
+  listProjectDeliveryActivations,
+  listProjectImplementationRecords,
+  listProjectDeploymentRecords,
+  listProjectObservationRecords,
+  listProjectStabilizationRecords,
+  listProjectHandoverRecords,
+  listProjectOngoingServiceRecords,
   listProjects,
   removeProjectMember,
   revokeOrganizationInvitation,
@@ -67,6 +78,16 @@ import type {
   Proposal,
   ProposalItem,
   ProposalVersion,
+  PaymentObligation,
+  PaymentAttempt,
+  Entitlement,
+  DeliveryActivation,
+  ImplementationRecord,
+  DeploymentRecord,
+  ObservationRecord,
+  StabilizationRecord,
+  HandoverRecord,
+  OngoingServiceRecord,
 } from '../../lib/organizations/types';
 import type { RouteState } from '../../routes/routeConfig';
 
@@ -320,7 +341,7 @@ function ProjectServicesPanel({ project, canManage, data }: { project: Project; 
       {error ? <div className="mt-4"><Alert title="Service selection unavailable" tone="danger">{error}</Alert></div> : null}
       {selectedServices.length ? <div className="mt-6 grid gap-3 md:grid-cols-2">{selectedServices.map((selection) => { const offering = offerings.find((item) => item.id === selection.offeringId); const service = services.find((item) => item.id === offering?.serviceId); const pillar = pillars.find((item) => item.id === service?.pillarId); return <div key={selection.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{pillar?.code ?? 'SERVICE'}</p><h3 className="mt-1 font-semibold text-slate-100">{service?.name ?? 'Selected service'}</h3><p className="mt-1 text-sm text-slate-400">{offering?.name ?? 'Offering'}</p></div><Badge tone={statusTone(selection.status)}>{selection.status}</Badge></div><p className="mt-3 text-xs text-slate-500">Selection only. Commercial approval and delivery activation are separate future steps.</p></div>; })}</div> : <EmptyState title="No services selected" message={canManage ? 'Choose an active offering to request the first service for this project.' : 'No project services have been requested for this project.'} />}
     </>}
-  </Card>{commercialData ? <CommercialPanel project={project} data={commercialData} /> : null}</>;
+  </Card>{commercialData ? <><CommercialPanel project={project} data={commercialData} /><PaymentObligationPanel project={project} data={commercialData} /><EntitlementPanel project={project} /><DeliveryActivationPanel project={project} /><ImplementationPanel project={project} /><DeploymentPanel project={project} /><ObservationPanel project={project} /><StabilizationPanel project={project} /><HandoverPanel project={project} /><OngoingServicePanel project={project} /></> : null}</>;
 }
 
 function CommercialPanel({ project, data }: { project: Project; data: PlatformData }) {
@@ -428,6 +449,163 @@ function CommercialPanel({ project, data }: { project: Project; data: PlatformDa
   const currentProposal = proposals.find((item) => item.id === selectedProposalId);
   const currentAgreement = agreements.find((item) => item.id === selectedAgreementId);
   return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Commercial foundation</p><h2 className="mt-2 text-xl font-semibold">Proposals and agreements</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Scope-based proposal snapshots use USD as the approved primary currency context without inventing prices. Acceptance does not create payment, entitlement, or delivery activation.</p></div><FileText className="text-cyan-300" size={24} /></div>{canManage ? <Button className="mt-5" onClick={createAndIssue} disabled={saving}>{saving ? 'Working…' : 'Create and issue proposal'} <Plus size={16} /></Button> : <p className="mt-5 text-sm text-slate-500">Only the organization owner can perform commercial acceptance actions.</p>}{error ? <div className="mt-4"><Alert title="Commercial action unavailable" tone="danger">{error}</Alert></div> : null}{message ? <div className="mt-4"><Alert title="Commercial state updated" tone="success">{message}</Alert></div> : null}<div className="mt-6 grid gap-5 lg:grid-cols-2"><div className="rounded-xl border border-slate-800 p-4"><div className="flex items-center justify-between gap-3"><h3 className="font-semibold">Proposal</h3><Badge tone={statusTone(currentProposal?.status ?? 'DRAFT')}>{currentProposal?.status ?? 'NONE'}</Badge></div>{proposals.length ? <select className={`${fieldClass} mt-4`} value={selectedProposalId} onChange={(event) => setSelectedProposalId(event.target.value)}>{proposals.map((proposal) => <option key={proposal.id} value={proposal.id}>{proposal.id.slice(0, 8)} · {proposal.status}</option>)}</select> : <p className="mt-4 text-sm text-slate-500">No proposals for this project.</p>}{versions[0] ? <><p className="mt-4 text-sm text-slate-300">Version {versions[0].versionNumber} · immutable snapshot · {versions[0].currency}</p><p className="mt-2 text-xs text-slate-500">{items.length} service item(s); prices and taxes are not defined.</p>{canManage && currentProposal?.status === 'SENT' ? <Button className="mt-4" size="sm" variant="outline" onClick={acceptCurrentProposal} disabled={saving}><CheckCircle2 size={15} /> Accept version</Button> : null}</> : null}</div><div className="rounded-xl border border-slate-800 p-4"><div className="flex items-center justify-between gap-3"><h3 className="font-semibold">Agreement</h3><Badge tone={statusTone(currentAgreement?.status ?? 'DRAFT')}>{currentAgreement?.status ?? 'NONE'}</Badge></div>{agreements.length ? <select className={`${fieldClass} mt-4`} value={selectedAgreementId} onChange={(event) => setSelectedAgreementId(event.target.value)}>{agreements.map((agreement) => <option key={agreement.id} value={agreement.id}>{agreement.id.slice(0, 8)} · {agreement.status}</option>)}</select> : <p className="mt-4 text-sm text-slate-500">No agreement records for this project.</p>}{currentProposal?.status === 'ACCEPTED' && !agreements.some((item) => item.sourceProposalVersionId === currentProposal.currentVersionId) && canManage ? <Button className="mt-4" size="sm" variant="outline" onClick={createAgreementRecord} disabled={saving}>Create agreement version</Button> : null}{agreementVersions[0] ? <><p className="mt-4 text-sm text-slate-300">Version {agreementVersions[0].versionNumber} · checksum recorded</p>{canManage && currentAgreement?.status !== 'ACTIVE' ? <Button className="mt-4" size="sm" variant="outline" onClick={acceptCurrentAgreement} disabled={saving}><CheckCircle2 size={15} /> Accept agreement</Button> : null}</> : null}</div></div></Card>;
+}
+
+function PaymentObligationPanel({ project, data }: { project: Project; data: PlatformData }) {
+  const membership = data.memberships.find((item) => item.userId === data.currentUserId);
+  const canManage = membership?.role === 'OWNER';
+  const [obligations, setObligations] = useState<PaymentObligation[]>([]);
+  const [attempts, setAttempts] = useState<PaymentAttempt[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const result = await listPaymentObligations(project.organizationId, project.id);
+    if (result.error) { setError(result.error.message); return; }
+    const attemptResults = await Promise.all(result.obligations.map((obligation) => listPaymentAttempts(obligation.id)));
+    const attemptError = attemptResults.find((item) => item.error)?.error;
+    if (attemptError) setError(attemptError.message);
+    else { setError(null); setObligations(result.obligations); setAttempts(attemptResults.flatMap((item) => item.attempts)); }
+  }, [project.id, project.organizationId]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const cancel = async (obligation: PaymentObligation) => {
+    if (!canManage || obligation.status !== 'PENDING') return;
+    setCancellingId(obligation.id);
+    const result = await cancelPaymentObligation(obligation.id);
+    setCancellingId(null);
+    if (result.error) setError(result.error.message);
+    else await load();
+  };
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Payment obligations</p><h2 className="mt-2 text-xl font-semibold">Server-authoritative obligations</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">These records preserve approved commercial amounts and sources. They do not process payment, prove settlement, grant entitlement, or activate delivery.</p></div><Badge tone="info">No checkout</Badge></div>{error ? <div className="mt-4"><Alert title="Payment obligations unavailable" tone="danger">{error}</Alert></div> : null}{obligations.length ? <div className="mt-6 space-y-3">{obligations.map((obligation) => <div key={obligation.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{obligation.paymentPurpose.replace('_', ' ')}</p><p className="mt-1 text-sm text-slate-200">{obligation.scheduleType} · USD minor units: {obligation.amountMinor}</p><p className="mt-1 text-xs text-slate-500">Source {obligation.proposalVersionId.slice(0, 8)} · {obligation.agreementVersionId ? `agreement ${obligation.agreementVersionId.slice(0, 8)}` : 'proposal source only'}</p></div><Badge tone={statusTone(obligation.status)}>{obligation.status}</Badge></div>{canManage && obligation.status === 'PENDING' ? <Button className="mt-3" variant="outline" onClick={() => cancel(obligation)} disabled={cancellingId === obligation.id}>{cancellingId === obligation.id ? 'Cancelling…' : 'Cancel obligation'}</Button> : null}<div className="mt-4 border-t border-slate-800 pt-3"><p className="text-xs uppercase tracking-wide text-slate-500">Payment attempts</p>{attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).length ? <div className="mt-2 space-y-2">{attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).map((attempt) => <div key={attempt.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800/80 p-3"><div><p className="text-sm text-slate-200">{attempt.id.slice(0, 8)} · {attempt.currency} minor units: {attempt.amountMinor}</p><p className="mt-1 text-xs text-slate-500">Created {new Date(attempt.createdAt).toLocaleString()}{attempt.statusReason ? ` · ${attempt.statusReason}` : ''}</p></div><Badge tone={statusTone(attempt.status)}>{attempt.status}</Badge></div>)}</div> : <p className="mt-2 text-xs text-slate-500">No payment attempts recorded.</p>}</div></div>)}</div> : <EmptyState title="No payment obligations" message="Payment obligations appear here only after a trusted server-side operation creates them from an accepted commercial source." />}</Card>;
+}
+
+function EntitlementPanel({ project }: { project: Project }) {
+  const [entitlements, setEntitlements] = useState<Entitlement[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listProjectEntitlements(project.id).then((result) => {
+      if (cancelled) return;
+      if (result.error) setError(result.error.message);
+      else setEntitlements(result.entitlements);
+    });
+    return () => { cancelled = true; };
+  }, [project.id]);
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Entitlements</p><h2 className="mt-2 text-xl font-semibold">Authorized service access</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Entitlements represent a future validated right to receive a scoped service. They do not start delivery, implementation, deployment, observation, or ongoing service.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Entitlements unavailable" tone="danger">{error}</Alert></div> : null}{entitlements.length ? <div className="mt-6 space-y-3">{entitlements.map((entitlement) => <div key={entitlement.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{entitlement.id.slice(0, 8)} · service {entitlement.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Source obligation {entitlement.paymentObligationId.slice(0, 8)}</p><p className="mt-1 text-xs text-slate-500">Starts {new Date(entitlement.startsAt).toLocaleString()}{entitlement.endsAt ? ` · Ends ${new Date(entitlement.endsAt).toLocaleString()}` : ' · No end recorded'}</p><p className="mt-1 text-xs text-slate-500">Created {new Date(entitlement.createdAt).toLocaleString()} · {entitlement.activationReference}</p></div><Badge tone={statusTone(entitlement.status)}>{entitlement.status}</Badge></div>{entitlement.statusReason ? <p className="mt-3 text-xs text-slate-400">{entitlement.statusReason}</p> : null}</div>)}</div> : <EmptyState title="No entitlements" message="No validated commercial event has created an entitlement for this project." />}</Card>;
+}
+
+function DeliveryActivationPanel({ project }: { project: Project }) {
+  const [activations, setActivations] = useState<DeliveryActivation[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listProjectDeliveryActivations(project.id).then((result) => {
+      if (cancelled) return;
+      if (result.error) setError(result.error.message);
+      else setActivations(result.activations);
+    });
+    return () => { cancelled = true; };
+  }, [project.id]);
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Delivery activation</p><h2 className="mt-2 text-xl font-semibold">Delivery lifecycle admission</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Activation admits an active entitlement into delivery. It does not mean payment settlement, deployment, observation completion, handover, or ongoing service.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Delivery activations unavailable" tone="danger">{error}</Alert></div> : null}{activations.length ? <div className="mt-6 space-y-3">{activations.map((activation) => <div key={activation.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{activation.id.slice(0, 8)} · service {activation.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Entitlement {activation.entitlementId.slice(0, 8)} · {activation.deliveryStage}</p><p className="mt-1 text-xs text-slate-500">Activated {new Date(activation.activatedAt).toLocaleString()}{activation.completedAt ? ` · Completed ${new Date(activation.completedAt).toLocaleString()}` : ''}</p><p className="mt-1 text-xs text-slate-500">{activation.activationReference}{activation.statusReason ? ` · ${activation.statusReason}` : ''}</p></div><Badge tone={statusTone(activation.status)}>{activation.status}</Badge></div></div>)}</div> : <EmptyState title="No delivery activations" message="No active entitlement has been admitted into this project's delivery lifecycle." />}</Card>;
+}
+
+function ImplementationPanel({ project }: { project: Project }) {
+  const [records, setRecords] = useState<ImplementationRecord[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listProjectImplementationRecords(project.id).then((result) => {
+      if (cancelled) return;
+      if (result.error) setError(result.error.message);
+      else setRecords(result.records);
+    });
+    return () => { cancelled = true; };
+  }, [project.id]);
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Implementation</p><h2 className="mt-2 text-xl font-semibold">Implementation workspace</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Implementation records represent work after delivery activation. This view is read-only and does not start infrastructure work or advance later delivery stages.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Implementation records unavailable" tone="danger">{error}</Alert></div> : null}{records.length ? <div className="mt-6 space-y-3">{records.map((record) => <div key={record.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{record.id.slice(0, 8)} · service {record.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Activation {record.deliveryActivationId.slice(0, 8)} · Entitlement {record.entitlementId.slice(0, 8)}</p><p className="mt-1 text-xs text-slate-500">{record.implementationReference} · Started {new Date(record.startedAt).toLocaleString()}{record.completedAt ? ` · Completed ${new Date(record.completedAt).toLocaleString()}` : ''}</p></div><Badge tone={statusTone(record.status)}>{record.status}</Badge></div>{record.statusReason ? <p className="mt-3 text-xs text-slate-400">{record.statusReason}</p> : null}</div>)}</div> : <EmptyState title="Implementation not initialized" message="No trusted implementation workspace has been initialized for this project." />}</Card>;
+}
+
+function DeploymentPanel({ project }: { project: Project }) {
+  const [records, setRecords] = useState<DeploymentRecord[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listProjectDeploymentRecords(project.id).then((result) => {
+      if (cancelled) return;
+      if (result.error) setError(result.error.message);
+      else setRecords(result.records);
+    });
+    return () => { cancelled = true; };
+  }, [project.id]);
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Deployment</p><h2 className="mt-2 text-xl font-semibold">Deployment foundation</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Deployment records represent a future deployment state after implementation. This view is read-only and does not execute infrastructure or provider actions.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Deployment records unavailable" tone="danger">{error}</Alert></div> : null}{records.length ? <div className="mt-6 space-y-3">{records.map((record) => <div key={record.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{record.id.slice(0, 8)} · service {record.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Implementation {record.implementationRecordId.slice(0, 8)} · Activation {record.deliveryActivationId.slice(0, 8)} · Entitlement {record.entitlementId.slice(0, 8)}</p><p className="mt-1 text-xs text-slate-500">{record.deploymentReference} · Started {new Date(record.startedAt).toLocaleString()}{record.completedAt ? ` · Completed ${new Date(record.completedAt).toLocaleString()}` : ''}</p></div><Badge tone={statusTone(record.status)}>{record.status}</Badge></div>{record.statusReason ? <p className="mt-3 text-xs text-slate-400">{record.statusReason}</p> : null}</div>)}</div> : <EmptyState title="No deployment records" message="Deployment has not been initialized for this project." />}</Card>;
+}
+
+function ObservationPanel({ project }: { project: Project }) {
+  const [records, setRecords] = useState<ObservationRecord[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listProjectObservationRecords(project.id).then((result) => {
+      if (cancelled) return;
+      if (result.error) setError(result.error.message);
+      else setRecords(result.records);
+    });
+    return () => { cancelled = true; };
+  }, [project.id]);
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Observation</p><h2 className="mt-2 text-xl font-semibold">Paid implementation observation</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Observation is a downstream implementation stage after active deployment. This view is read-only and does not create monitoring, timers, or stabilization automation.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Observation records unavailable" tone="danger">{error}</Alert></div> : null}{records.length ? <div className="mt-6 space-y-3">{records.map((record) => <div key={record.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{record.id.slice(0, 8)} · service {record.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Deployment {record.deploymentRecordId.slice(0, 8)} · Implementation {record.implementationRecordId.slice(0, 8)}</p><p className="mt-1 text-xs text-slate-500">{record.observationReference} · Started {new Date(record.startedAt).toLocaleString()}{record.completedAt ? ` · Completed ${new Date(record.completedAt).toLocaleString()}` : ''}</p></div><Badge tone={statusTone(record.status)}>{record.status}</Badge></div>{record.statusReason ? <p className="mt-3 text-xs text-slate-400">{record.statusReason}</p> : null}</div>)}</div> : <EmptyState title="No observation records" message="Observation has not been initialized for this project." />}</Card>;
+}
+
+function StabilizationPanel({ project }: { project: Project }) {
+  const [records, setRecords] = useState<StabilizationRecord[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listProjectStabilizationRecords(project.id).then((result) => {
+      if (cancelled) return;
+      if (result.error) setError(result.error.message);
+      else setRecords(result.records);
+    });
+    return () => { cancelled = true; };
+  }, [project.id]);
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Stabilization</p><h2 className="mt-2 text-xl font-semibold">Paid implementation stabilization</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Stabilization is downstream of active observation within the paid implementation lifecycle. This view is read-only and does not add monitoring, remediation, or handover automation.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Stabilization records unavailable" tone="danger">{error}</Alert></div> : null}{records.length ? <div className="mt-6 space-y-3">{records.map((record) => <div key={record.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{record.id.slice(0, 8)} · service {record.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Observation {record.observationRecordId.slice(0, 8)} · Deployment {record.deploymentRecordId.slice(0, 8)} · Implementation {record.implementationRecordId.slice(0, 8)}</p><p className="mt-1 text-xs text-slate-500">{record.stabilizationReference} · Started {new Date(record.startedAt).toLocaleString()}{record.completedAt ? ` · Completed ${new Date(record.completedAt).toLocaleString()}` : ''}</p></div><Badge tone={statusTone(record.status)}>{record.status}</Badge></div>{record.statusReason ? <p className="mt-3 text-xs text-slate-400">{record.statusReason}</p> : null}</div>)}</div> : <EmptyState title="No stabilization records" message="Stabilization has not been initialized for this project." />}</Card>;
+}
+
+function HandoverPanel({ project }: { project: Project }) {
+  const [records, setRecords] = useState<HandoverRecord[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listProjectHandoverRecords(project.id).then((result) => {
+      if (cancelled) return;
+      if (result.error) setError(result.error.message);
+      else setRecords(result.records);
+    });
+    return () => { cancelled = true; };
+  }, [project.id]);
+
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Handover</p><h2 className="mt-2 text-xl font-semibold">Handover foundation</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Handover is the downstream implementation lifecycle boundary after active documentation. This view is read-only and does not transfer files, signatures, credentials, or infrastructure ownership.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Handover records unavailable" tone="danger">{error}</Alert></div> : null}{records.length ? <div className="mt-6 space-y-3">{records.map((record) => <div key={record.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{record.id.slice(0, 8)} · service {record.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Documentation {record.documentationRecordId.slice(0, 8)} · Stabilization {record.stabilizationRecordId.slice(0, 8)} · Observation {record.observationRecordId.slice(0, 8)}</p><p className="mt-1 text-xs text-slate-500">{record.handoverReference} · Started {new Date(record.startedAt).toLocaleString()}{record.completedAt ? ` · Completed ${new Date(record.completedAt).toLocaleString()}` : ''}</p></div><Badge tone={statusTone(record.status)}>{record.status}</Badge></div>{record.statusReason ? <p className="mt-3 text-xs text-slate-400">{record.statusReason}</p> : null}</div>)}</div> : <EmptyState title="No handover records" message="Handover has not been initialized for this project." />}</Card>;
+}
+
+function OngoingServicePanel({ project }: { project: Project }) {
+  const [records, setRecords] = useState<OngoingServiceRecord[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => { let cancelled = false; void listProjectOngoingServiceRecords(project.id).then((result) => { if (cancelled) return; if (result.error) setError(result.error.message); else setRecords(result.records); }); return () => { cancelled = true; }; }, [project.id]);
+  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Ongoing service</p><h2 className="mt-2 text-xl font-semibold">Optional post-handover service</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Ongoing service is optional and separately paid. This read-only foundation does not execute billing, subscriptions, or payment collection.</p></div><Badge tone="info">Read only</Badge></div>{error ? <div className="mt-4"><Alert title="Ongoing service records unavailable" tone="danger">{error}</Alert></div> : null}{records.length ? <div className="mt-6 space-y-3">{records.map((record) => <div key={record.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{record.id.slice(0, 8)} · service {record.projectServiceId.slice(0, 8)}</p><p className="mt-1 text-sm text-slate-200">Handover {record.handoverRecordId.slice(0, 8)} · Entitlement {record.entitlementId.slice(0, 8)}</p><p className="mt-1 text-xs text-slate-500">{record.ongoingServiceReference} · {record.billingMode} · Started {new Date(record.startedAt).toLocaleString()}</p></div><Badge tone={statusTone(record.status)}>{record.status}</Badge></div>{record.statusReason ? <p className="mt-3 text-xs text-slate-400">{record.statusReason}</p> : null}</div>)}</div> : <EmptyState title="No ongoing service records" message="Optional ongoing service has not been initialized after handover." />}</Card>;
 }
 
 function CommercialRecordsPage({ data, onNavigate, kind, resourceId }: { data: PlatformData; onNavigate: (target: string) => void; kind: 'proposal' | 'agreement'; resourceId?: string }) {
