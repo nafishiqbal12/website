@@ -8,22 +8,22 @@ This phase does not implement payment settlement, a payment provider, checkout, 
 
 ## Migration
 
-- Migration: `supabase/migrations/202609150013_payment_obligations.sql`
-- Hardening migration: `supabase/migrations/202609150014_payment_obligation_hardening.sql`
-- Attempt migration: `supabase/migrations/202609150015_payment_attempts.sql`
-- Entitlement migration: `supabase/migrations/202609150016_entitlements.sql`
-- Delivery activation migration: `supabase/migrations/202609150017_delivery_activations.sql`
-- Implementation record migration: `supabase/migrations/202609150018_implementation_records.sql`
-- Deployment record migration: `supabase/migrations/202609150019_deployment_records.sql`
-- Observation record migration: `supabase/migrations/202609150020_observation_records.sql`
-- Stabilization record migration: `supabase/migrations/202609150021_stabilization_records.sql`
-- Documentation record migration: `supabase/migrations/202609150022_documentation_records.sql`
-- Handover record migration: `supabase/migrations/202609150023_handover_records.sql`
-- Ongoing-service migration: `supabase/migrations/202609150024_ongoing_service_records.sql`
-- Deployment: applied successfully to the linked Supabase project.
-- Migration synchronization: local and remote both report `202609150024`.
 
 ## Database Object
+
+## Provider-Neutral Payment Integration Boundary
+
+The internal payment foundation now has a provider-neutral TypeScript boundary in `src/lib/payments/`:
+
+- `types.ts`: checkout request/result, checkout status, verification, provider error, and source-context contracts;
+- `providerAdapter.ts`: future provider adapter contract for checkout creation, status retrieval, result verification, normalized provider references, and safe errors;
+- `service.ts`: fail-safe payment service that returns `PROVIDER_NOT_CONFIGURED` or `PROVIDER_NOT_INTEGRATED` and never fabricates a checkout URL, transaction reference, payment success, settlement, or entitlement activation.
+
+Checkout requests reference existing internal payment obligation and attempt IDs. Amount, currency, tenant, project, commercial source, and payment state remain server-authoritative database facts. No provider SDK, credentials, webhook, settlement, or migration was added.
+
+The project payment panel explicitly shows **Provider not configured** and **No checkout** while continuing to expose only existing server-authoritative obligation/attempt state.
+
+REAL PAYMENT PROVIDER INTEGRATION IS STILL DEFERRED.
 
 ### `public.payment_obligations`
 
