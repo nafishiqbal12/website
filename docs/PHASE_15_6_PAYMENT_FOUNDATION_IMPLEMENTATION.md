@@ -6,6 +6,36 @@
 
 This phase does not implement payment settlement, a payment provider, checkout, webhooks, reconciliation, refunds, credits, disputes, tax calculation, subscriptions, recurring billing execution, delivery activation, observation automation, e-signature, or new commercial roles.
 
+## Phase 15.18D - Deployment and Remote Security Verification
+
+### Implemented
+
+- `202609150025_payment_settlements.sql` defines verified Stripe settlement records, trusted settlement reconciliation, audit linkage, RLS, and uniqueness constraints.
+- `supabase/functions/stripe-webhook/index.ts` accepts POST requests, verifies the raw Stripe webhook body and signature, reconciles internal payment metadata, and calls the trusted settlement RPC.
+- The settlement RPC uses `SECURITY DEFINER`, a fixed `search_path`, server-role enforcement, tenant and obligation/attempt relationship checks, amount and currency validation, idempotency checks, and audit creation.
+- Settlement remains separate from entitlement and delivery activation; no downstream lifecycle is advanced automatically.
+
+### Remote deployed
+
+- Migration `202609150025` was applied successfully to the linked Supabase project and `supabase migration list --linked` confirms synchronization through `202609150025`.
+- Edge Function `stripe-webhook` was deployed successfully and is reported `ACTIVE` at version 2.
+- Function configuration reports `verify_jwt: false` for this function only. Stripe webhook authentication remains enforced by `Stripe-Signature` verification in the function.
+
+### Verified
+
+- The remote migration ledger confirms the settlement migration is applied after `202609150024`.
+- The deployed function is named `stripe-webhook` and uses the intended entrypoint.
+- The migration defines `public.payment_settlements`, `payment_settlement_id` on `audit_events`, the `payment_settlement_created` audit event, provider-event uniqueness, and payment-attempt uniqueness.
+- RLS and trusted-server-only insert/update/delete policies are defined by the deployed migration; authenticated members have read access only within the existing organization/project authorization boundary.
+- The function preserves the raw request body, rejects non-POST requests and missing signatures, verifies signatures before trusting event payloads, ignores unsupported verified event types safely, and never trusts browser redirects or client payment state.
+- Structural idempotency is verified from the deployed migration. Real replay behavior requires a genuine Stripe event and remains deferred.
+
+### Deferred
+
+- Stripe secrets are not configured in the remote function environment; no `STRIPE_SECRET_KEY` or `STRIPE_WEBHOOK_SECRET` was present in the secret inventory.
+- No real Stripe payment or webhook event was sent. Live signature validation, provider delivery, and replay/idempotency runtime testing remain deferred.
+- Entitlement activation, delivery activation, implementation, deployment, observation, stabilization, documentation, handover, and ongoing service remain intentionally separate from settlement.
+
 ## Migration
 
 
@@ -21,9 +51,38 @@ The internal payment foundation now has a provider-neutral TypeScript boundary i
 
 Checkout requests reference existing internal payment obligation and attempt IDs. Amount, currency, tenant, project, commercial source, and payment state remain server-authoritative database facts. No provider SDK, credentials, webhook, settlement, or migration was added.
 
-The project payment panel explicitly shows **Provider not configured** and **No checkout** while continuing to expose only existing server-authoritative obligation/attempt state.
+The project payment panel is intentionally truthful and shows the provider boundary state, while the real processor flow lives behind the server-only adapter layer.
 
-REAL PAYMENT PROVIDER INTEGRATION IS STILL DEFERRED.
+### Stripe provider status
+
+The first real provider integration has been implemented as a server-only Stripe adapter behind the neutral payment boundary:
+
+- `src/lib/payments/stripeProviderAdapter.ts` loads `STRIPE_SECRET_KEY` only from the server process environment and never from browser/Vite values;
+- the adapter creates Stripe Checkout sessions using `stripe.checkout.sessions.create(...)` with a provider-specific metadata payload and safe redirect URLs;
+- the adapter can retrieve checkout session status and inspect the related `payment_intent` without exposing Stripe secrets to the client;
+- the adapter returns provider-not-configured errors until a trusted server secret is present, preventing fabricated success or fake settlement claims;
+- checkout initiation remains governed by the existing payment obligation and payment-attempt lifecycle; no entitlement or delivery activation is triggered by a browser redirect alone.
+
+This is an implementation of the Stripe boundary, not a live payment settlement or entitlement activation. The following are still deferred until deployment secrets and webhook configuration are available:
+
+- secure settlement reconciliation against provider events;
+- persistence of successful payment verification into trusted settlement records;
+- entitlement activation after verified settlement;
+- production checkout success/cancel callback handling and webhook-driven state transitions;
+- end-to-end runtime verification against actual Stripe credentials and test/live events.
+
+### Stripe webhook verification foundation
+
+The provider boundary now adds a server-side verification step that validates the raw Stripe request body against the `Stripe-Signature` header using `stripe.webhooks.constructEvent(...)` and `STRIPE_WEBHOOK_SECRET` from the trusted server environment. This is the minimum required safety gate for receiving provider events without trusting browser callbacks or redirect success URLs.
+
+The verification result is intentionally limited to signature validation and event correlation:
+
+- it returns a verified `eventId`, `eventType`, object type, and provider object reference;
+- it does not assert settlement success, entitlement activation, or delivery progression;
+- it fails closed if the secret is missing or the signature header is absent or invalid;
+- it remains behind the provider-neutral payment service and never exposes Stripe secrets to the browser.
+
+This allows future server routes or worker jobs to ingest provider events, correlate them to internal `payment_attempt`s, and apply a separate, policy-controlled settlement transition only after a trusted server verifies the webhook and the business rules permit it.
 
 ### `public.payment_obligations`
 

@@ -24,6 +24,7 @@ import {
   createAgreement,
   createAgreementVersion,
   createProject,
+  createPaymentAttempt,
   createProposal,
   createProposalVersion,
   getProject,
@@ -89,6 +90,7 @@ import type {
   HandoverRecord,
   OngoingServiceRecord,
 } from '../../lib/organizations/types';
+import { paymentService } from '../../lib/payments/service';
 import type { RouteState } from '../../routes/routeConfig';
 
 type PlatformAppProps = {
@@ -458,6 +460,7 @@ function PaymentObligationPanel({ project, data }: { project: Project; data: Pla
   const [attempts, setAttempts] = useState<PaymentAttempt[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [startingCheckoutId, setStartingCheckoutId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const result = await listPaymentObligations(project.organizationId, project.id);
@@ -479,7 +482,116 @@ function PaymentObligationPanel({ project, data }: { project: Project; data: Pla
     else await load();
   };
 
-  return <Card className="xl:col-span-2"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Payment obligations</p><h2 className="mt-2 text-xl font-semibold">Server-authoritative obligations</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">These records preserve approved commercial amounts and sources. They do not process payment, prove settlement, grant entitlement, or activate delivery.</p></div><div className="flex gap-2"><Badge tone="info">Provider not configured</Badge><Badge tone="info">No checkout</Badge></div></div>{error ? <div className="mt-4"><Alert title="Payment obligations unavailable" tone="danger">{error}</Alert></div> : null}{obligations.length ? <div className="mt-6 space-y-3">{obligations.map((obligation) => <div key={obligation.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{obligation.paymentPurpose.replace('_', ' ')}</p><p className="mt-1 text-sm text-slate-200">{obligation.scheduleType} · USD minor units: {obligation.amountMinor}</p><p className="mt-1 text-xs text-slate-500">Source {obligation.proposalVersionId.slice(0, 8)} · {obligation.agreementVersionId ? `agreement ${obligation.agreementVersionId.slice(0, 8)}` : 'proposal source only'}</p></div><Badge tone={statusTone(obligation.status)}>{obligation.status}</Badge></div>{canManage && obligation.status === 'PENDING' ? <Button className="mt-3" variant="outline" onClick={() => cancel(obligation)} disabled={cancellingId === obligation.id}>{cancellingId === obligation.id ? 'Cancelling…' : 'Cancel obligation'}</Button> : null}<div className="mt-4 border-t border-slate-800 pt-3"><p className="text-xs uppercase tracking-wide text-slate-500">Payment attempts</p>{attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).length ? <div className="mt-2 space-y-2">{attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).map((attempt) => <div key={attempt.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800/80 p-3"><div><p className="text-sm text-slate-200">{attempt.id.slice(0, 8)} · {attempt.currency} minor units: {attempt.amountMinor}</p><p className="mt-1 text-xs text-slate-500">Created {new Date(attempt.createdAt).toLocaleString()}{attempt.statusReason ? ` · ${attempt.statusReason}` : ''}</p></div><Badge tone={statusTone(attempt.status)}>{attempt.status}</Badge></div>)}</div> : <p className="mt-2 text-xs text-slate-500">No payment attempts recorded.</p>}</div></div>)}</div> : <EmptyState title="No payment obligations" message="Payment obligations appear here only after a trusted server-side operation creates them from an accepted commercial source." />}</Card>;
+  const startCheckout = async (obligation: PaymentObligation) => {
+    if (!canManage || obligation.status !== 'PENDING') return;
+    setStartingCheckoutId(obligation.id);
+    setError(null);
+
+    const attemptResult = await createPaymentAttempt({
+      paymentObligationId: obligation.id,
+      amountMinor: obligation.amountMinor,
+      currency: obligation.currency,
+      idempotencyKey: `checkout-${obligation.id}-${Date.now()}`,
+      commercialSnapshot: obligation.commercialSnapshot,
+    });
+
+    if (attemptResult.error || !attemptResult.attempt) {
+      setError(attemptResult.error?.message ?? 'The payment attempt could not be created.');
+      setStartingCheckoutId(null);
+      return;
+    }
+
+    const checkoutResult = await paymentService.createCheckoutSession(
+      {
+        paymentObligationId: obligation.id,
+        paymentAttemptId: attemptResult.attempt.id,
+        idempotencyKey: attemptResult.attempt.idempotencyKey,
+      },
+      obligation,
+      attemptResult.attempt,
+    );
+
+    setStartingCheckoutId(null);
+
+    if (!checkoutResult.ok) {
+      setError(checkoutResult.error.message);
+      return;
+    }
+
+    if (checkoutResult.checkoutUrl) {
+      window.location.assign(checkoutResult.checkoutUrl);
+      return;
+    }
+
+    setError('Secure checkout is configured but no redirect URL was returned by the provider.');
+  };
+
+  return (
+    <Card className="xl:col-span-2">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Payment obligations</p>
+          <h2 className="mt-2 text-xl font-semibold">Server-authoritative obligations</h2>
+          <p className="mt-2 max-w-3xl text-sm text-slate-400">These records preserve approved commercial amounts and sources. They do not process payment, prove settlement, grant entitlement, or activate delivery.</p>
+        </div>
+        <div className="flex gap-2">
+          <Badge tone="info">Provider boundary</Badge>
+          <Badge tone="info">Secure redirect</Badge>
+        </div>
+      </div>
+
+      {error ? <div className="mt-4"><Alert title="Payment obligations unavailable" tone="danger">{error}</Alert></div> : null}
+
+      {obligations.length ? (
+        <div className="mt-6 space-y-3">
+          {obligations.map((obligation) => (
+            <div key={obligation.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-cyan-300">{obligation.paymentPurpose.replace('_', ' ')}</p>
+                  <p className="mt-1 text-sm text-slate-200">{obligation.scheduleType} · USD minor units: {obligation.amountMinor}</p>
+                  <p className="mt-1 text-xs text-slate-500">Source {obligation.proposalVersionId.slice(0, 8)} · {obligation.agreementVersionId ? `agreement ${obligation.agreementVersionId.slice(0, 8)}` : 'proposal source only'}</p>
+                </div>
+                <Badge tone={statusTone(obligation.status)}>{obligation.status}</Badge>
+              </div>
+
+              {canManage && obligation.status === 'PENDING' ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={() => startCheckout(obligation)} disabled={startingCheckoutId === obligation.id}>
+                    {startingCheckoutId === obligation.id ? 'Redirecting…' : 'Start secure checkout'}
+                  </Button>
+                  <Button variant="ghost" onClick={() => cancel(obligation)} disabled={cancellingId === obligation.id}>
+                    {cancellingId === obligation.id ? 'Cancelling…' : 'Cancel obligation'}
+                  </Button>
+                </div>
+              ) : null}
+
+              <div className="mt-4 border-t border-slate-800 pt-3">
+                <p className="text-xs uppercase tracking-wide text-slate-500">Payment attempts</p>
+                {attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).length ? (
+                  <div className="mt-2 space-y-2">
+                    {attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).map((attempt) => (
+                      <div key={attempt.id} className="rounded-lg border border-slate-800 bg-slate-900/60 p-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-xs text-slate-300">Attempt {attempt.id.slice(0, 8)}</p>
+                          <Badge tone={statusTone(attempt.status)}>{attempt.status}</Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-slate-500">{attempt.amountMinor} minor units · {attempt.currency} · {attempt.createdAt ? new Date(attempt.createdAt).toLocaleString() : 'timestamp unknown'}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-2 text-xs text-slate-500">No payment attempts recorded yet.</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyState title="No payment obligations" message="Approved commercial obligations will appear here after a proposal or agreement is accepted and a payment source is created." />
+      )}
+    </Card>
+  );
 }
 
 function EntitlementPanel({ project }: { project: Project }) {
