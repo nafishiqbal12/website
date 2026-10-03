@@ -293,6 +293,7 @@ export type Entitlement = {
   projectId: string;
   projectServiceId: string;
   paymentObligationId: string;
+  paymentSettlementId: string | null;
   proposalId: string;
   proposalVersionId: string;
   agreementId: string | null;

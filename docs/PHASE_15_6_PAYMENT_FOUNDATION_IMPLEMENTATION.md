@@ -36,6 +36,672 @@ This phase does not implement payment settlement, a payment provider, checkout, 
 - No real Stripe payment or webhook event was sent. Live signature validation, provider delivery, and replay/idempotency runtime testing remain deferred.
 - Entitlement activation, delivery activation, implementation, deployment, observation, stabilization, documentation, handover, and ongoing service remain intentionally separate from settlement.
 
+## Phase 15.18E — Stripe Live Test Readiness and Fail-Closed Configuration
+
+### Required secret names
+
+The payment implementation currently expects the following server-bound names:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+These names are the current trusted runtime contract. No `VITE_STRIPE_SECRET_KEY` or `VITE_STRIPE_WEBHOOK_SECRET` values are used anywhere in the client or build path. No secret names were renamed to avoid a concrete inconsistency; the implementation remains aligned with the existing deployed server configuration.
+
+### Secret handling and boundary
+
+- `src/lib/payments/stripeProviderAdapter.ts` reads `STRIPE_SECRET_KEY` only through a server-side environment guard that explicitly refuses browser execution via `typeof window !== 'undefined'`.
+- `supabase/functions/stripe-webhook/index.ts` reads `STRIPE_WEBHOOK_SECRET`, `STRIPE_SECRET_KEY`, `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` from the trusted Edge Function environment only.
+- Missing Stripe secrets fail closed. Checkout creation returns a provider-not-configured error and never fabricates a checkout URL. Webhook processing returns an explicit failing response before any settlement logic runs.
+- No secret literals are embedded in source or documentation. No secret values were printed into chat, logs, or generated output.
+- The browser bundle never receives these values. The Supabase client boundary remains browser-safe and uses the public anon-facing variables only.
+
+### Checkout metadata correlation
+
+The checkout session creation path already includes stable internal correlation identifiers in metadata and the provider reference record:
+
+- `payment_obligation_id`
+- `payment_attempt_id`
+- `organization_id`
+- `project_id`
+- `idempotency_key`
+- `provider`
+- `client_reference_id` set to `payment_attempt_id`
+
+The webhook reconciliation path validates that the verified Stripe event contains the internal IDs and matches the stored obligation/attempt records. This uses internal IDs as the correlation source and does not rely on email, project name, organization name, amount, or timestamp as the primary key.
+
+### Webhook verification and fail-closed behavior
+
+`supabase/functions/stripe-webhook/index.ts` preserves the raw request body and requires the `Stripe-Signature` header before processing. The function:
+
+- rejects non-POST requests;
+- rejects missing `Stripe-Signature` headers;
+- rejects missing `STRIPE_WEBHOOK_SECRET` or `STRIPE_SECRET_KEY` before signature verification;
+- verifies the payload via `stripe.webhooks.constructEvent(rawBody, signature, STRIPE_WEBHOOK_SECRET)`;
+- ignores unsupported event types after verification;
+- rejects verified events without the internal correlation metadata required for settlement reconciliation;
+- performs settlement only through the trusted `create_payment_settlement(...)` RPC after obligation/attempt validation and amount/currency checks.
+
+There is no unsigned alternative webhook path. Browser redirects and client callbacks cannot trigger settlement directly.
+
+### READY FOR REAL TEST
+
+This implementation is ready for real Stripe test-mode configuration when the trusted environment contains the required server secrets and the runtime remains operational.
+
+The required configuration contract is limited to:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+The implementation works with Stripe test-mode credentials, provided they are installed in the trusted server/runtime environment and the Edge Function can start successfully. It does not require production credentials.
+
+### ACTUALLY LIVE VERIFIED
+
+No live Stripe event has been processed in this session. The work remains at readiness verification only because the trusted environment does not currently carry the Stripe secrets, and the remote Edge Function runtime remains subject to the existing `WORKER_RESOURCE_LIMIT` condition.
+
+No fake provider data, fake signatures, fake settlements, fake checkout sessions, or manual payment success markers were created.
+
+### WORKER_RESOURCE_LIMIT investigation
+
+The `WORKER_RESOURCE_LIMIT` condition was checked with safe available diagnostics only:
+
+- the function is configured as `stripe-webhook` and is `ACTIVE`;
+- the payment implementation uses a minimal server-only provider boundary and does not import the browser app into the Edge Function;
+- the Stripe SDK is lazy-loaded only inside the server-side runtime path;
+- the webhook uses a narrow runtime surface and the verified event pipeline is separate from the browser app;
+- the function dependency graph remains intentionally small and does not add a broad app bundle into the worker;
+- the runtime issue remains external to the app’s security design, and the implementation therefore does not remove verification or weaken the boundary.
+
+The current evidence indicates the issue is a runtime capacity or worker limit on the Supabase-side deployment rather than a result of the fail-closed Stripe verification logic itself. No insecure bypass of signature verification or no-secret handling was introduced.
+
+### Runtime status and real test status
+
+- Edge Function runtime: deployed and `ACTIVE`.
+- Stripe secrets: absent in the current trusted environment.
+- Webhook verification: implemented and fail-closed.
+- Real Stripe test mode: not performed because the required real credentials are absent and the runtime is still blocked by the worker limit.
+- Real settlement verification: not performed because no real Stripe event reached the function.
+- Entitlement activation: intentionally not connected in this phase.
+
+### Deferred blockers
+
+The exact blockers remaining are:
+
+1. `STRIPE_SECRET_KEY` is not configured in the trusted environment.
+2. `STRIPE_WEBHOOK_SECRET` is not configured in the trusted environment.
+3. The remote Edge Function runtime remains subject to `WORKER_RESOURCE_LIMIT`.
+4. No real Stripe test-mode Checkout/webhook lifecycle was executed.
+
+These blockers remain outside the payment implementation itself and are not bypassed by weakening the security boundary.
+
+### Entitlement boundary
+
+Settlement remains separate from entitlement activation and delivery activation. The lifecycle remains:
+
+Settlement
+↓
+separate trusted entitlement activation
+↓
+delivery activation
+↓
+implementation
+↓
+deployment
+↓
+observation
+↓
+stabilization
+↓
+documentation
+↓
+handover
+↓
+optional ongoing service
+
+No automatic entitlement or delivery activation is triggered by a verified settlement in this phase.
+
+## Phase 15.18F — Controlled Stripe Test-Mode Verification + Runtime Blocker Handling
+
+### Verification scope
+
+This phase verified the actual repository and remote state without inventing a Stripe test or bypassing the fail-closed runtime boundary. The evidence used was the current code in `src/lib/payments/`, the deployed Edge Function in Supabase, the live migration ledger, and the existing trusted secret inventory available from the linked project.
+
+### Trusted secret configuration status
+
+The trusted runtime currently reports these configuration states without exposing values:
+
+- `STRIPE_SECRET_KEY`: ABSENT / NOT CONFIGURED
+- `STRIPE_WEBHOOK_SECRET`: ABSENT / NOT CONFIGURED
+- `SUPABASE_URL`: PRESENT
+- `SUPABASE_SERVICE_ROLE_KEY`: PRESENT
+- `VITE_STRIPE_SECRET_KEY`: NOT PRESENT
+- `VITE_STRIPE_WEBHOOK_SECRET`: NOT PRESENT
+
+No secret values were printed, logged, committed, or added to source or documentation. The code path remains server-only, and no browser-side Stripe secret handling is present.
+
+### Real Stripe test-mode execution status
+
+A real Stripe test-mode Checkout → webhook → settlement verification was not executed because the required trusted Stripe secrets were not configured in the runtime and the Edge Function remains constrained by the current `WORKER_RESOURCE_LIMIT` condition. This is a deliberate blocker, not a fallback or synthetic success path.
+
+### Checkout metadata verification
+
+The current checkout creation path contains the required internal correlation metadata in the Stripe Checkout Session payload:
+
+- `payment_obligation_id`
+- `payment_attempt_id`
+- `organization_id`
+- `project_id`
+- `idempotency_key`
+- `provider`
+- `client_reference_id` set to the attempt ID
+
+The webhook reconciliation path enforces the same internal IDs and therefore remains bound to the trusted obligation/attempt records instead of relying on user-supplied identity data.
+
+### Webhook verification status
+
+The implementation remains in a correct fail-closed state:
+
+- raw request body is preserved;
+- `Stripe-Signature` is required;
+- missing signatures are rejected;
+- invalid signatures are rejected;
+- missing webhook secret rejects the request;
+- unsupported event types are ignored safely after verification;
+- settlement is only attempted after the verified event matches the internal obligation and attempt state;
+- browser redirects or client data do not create settlements.
+
+This is still a verified configuration boundary and not a live runtime success claim.
+
+### Negative security tests
+
+The following security checks are possible only when the trusted runtime is operational. They remain deferred or blocked rather than simulated:
+
+- missing `Stripe-Signature` → BLOCKED by absent runtime + missing Stripe secret configuration
+- invalid `Stripe-Signature` → NOT EXECUTED against a real webhook in this environment
+- malformed event → NOT EXECUTED
+- unsupported event type → SAFELY HANDLED in code path, but not exercised against a real runtime webhook
+- wrong amount/currency → code path exists but not executed with a real Stripe test event
+- unknown payment attempt / mismatched obligation → code path exists but not executed against a live provider event
+- duplicate provider event / duplicate settlement → code path exists and is enforced in the trusted RPC, but not exercised with a real event in this environment
+
+No insecure workaround was introduced to bypass signature verification or simulate a successful webhook path.
+
+### WORKER_RESOURCE_LIMIT status
+
+The current Supabase Edge Function runtime remains subject to `WORKER_RESOURCE_LIMIT` while the Stripe secrets are absent. The evidence available is limited to safe diagnostics only:
+
+- the `stripe-webhook` function is deployed and `ACTIVE`;
+- the runtime is not currently able to process a real Stripe webhook in this environment;
+- the handler is minimal and does not import browser-only code or expose secrets;
+- the security verification logic remains in place and unweakened.
+
+This is a runtime capacity/deployment blocker rather than an application-level security bypass. The function remains protected by signature verification, not by custom/insecure verification logic.
+
+### Settlement verification status
+
+Settlement verification remains `NOT EXECUTED` because no real Stripe checkout session or `checkout.session.completed` event reached the trusted server in this environment. The database side remains guarded by the trusted RPC and the migration constraints, but no real settlement row was created in this phase.
+
+### Entitlement boundary confirmation
+
+The current boundary remains unchanged:
+
+Stripe settlement
+→ separate trusted entitlement activation
+→ separate delivery activation
+
+No automatic entitlement activation, delivery initialization, or downstream lifecycle progression was added or triggered in this phase.
+
+### Validation commands and results
+
+The following validation steps were executed and passed where applicable:
+
+- `npm run typecheck -- --pretty false` → PASS
+- `npm run lint` → PASS with 2 existing SEO warnings and 0 errors
+- `npm run build` → PASS
+- `git diff --check` → PASS
+- `supabase migration list --linked` → PASS; migrations synchronized through `202609150025`
+- `supabase functions list --output json` → PASS; `stripe-webhook` list entry shows status `ACTIVE`
+
+The working tree was checked after validation and only the intended documentation update remained.
+
+### Remaining blockers
+
+1. `STRIPE_SECRET_KEY` is absent from the trusted runtime.
+2. `STRIPE_WEBHOOK_SECRET` is absent from the trusted runtime.
+3. The Supabase Edge Function runtime remains blocked by `WORKER_RESOURCE_LIMIT`.
+4. No real Stripe test-mode payment flow was executed in the linked environment.
+
+### Verdict for this phase
+
+`PASS WITH DEFERRED RUNTIME TESTS`
+
+The implementation is correct and fail-closed, but a real Stripe test-mode webhook and settlement verification remains deferred because the trusted runtime does not currently provide the required Stripe credentials and the function runtime is still constrained.
+
+## Phase 15.18G — Final Deployment Verification and Closure
+
+### Local migration status
+
+The intended next migration is present at `supabase/migrations/202610030001_settlement_entitlement_activation.sql`. The local migration order is:
+
+- `202609150025_payment_settlements.sql`
+- `202610030001_settlement_entitlement_activation.sql`
+
+No duplicate migration version or ordering conflict was found. The migration was kept as the intended next migration; no additional migration was created.
+
+The local review covered the existing entitlement schema and activation RPC, settlement schema and settlement RPC, audit event vocabulary, TypeScript entitlement model, and data mapping.
+
+### Settlement to entitlement bridge
+
+A new server-only transition was added to link a verified payment settlement to a single entitlement activation:
+
+- `supabase/migrations/202610030001_settlement_entitlement_activation.sql`
+- `public.activate_entitlement_from_settlement(...)`
+
+This transition is intentionally limited to the first lifecycle boundary:
+
+Verified settlement → active entitlement
+
+The bridge requires a trusted service-role actor, a verified settlement, a pending obligation, a matching payment attempt, the same organization and project, matching proposal/version and agreement/version source fields, matching amount and currency, and a project service included in the accepted current proposal scope. It does not initialize delivery activation or downstream operational records.
+
+### Source relationship validation
+
+The trusted activation path validates all core source relationships before creating entitlement state:
+
+- payment settlement exists;
+- payment attempt exists and matches the settlement;
+- payment obligation matches the settlement source fields, amount, currency, organization, and project;
+- project service belongs to the same organization/project as the obligation;
+- proposal and accepted current proposal version match the obligation source;
+- project service is included in the proposal scope;
+- agreement and active accepted agreement version match when the obligation has an agreement source;
+- date window is valid;
+- no conflicting settlement-to-entitlement mapping already exists.
+
+The new `payment_settlement_id` source link is protected by a database trigger against mutation after entitlement creation.
+
+The path intentionally rejects mismatches instead of creating partial entitlement state.
+
+### Idempotency strategy
+
+The activation function uses both:
+
+- a unique `payment_settlement_id` -> entitlement mapping; and
+- a stable idempotency key (`idempotency_key`)
+
+This prevents duplicate active entitlements on retry, duplicate webhook replay, or repeated trusted activation attempts. Repeated activation of the same settlement returns the existing entitlement instead of creating a second record. The unique settlement link, organization/idempotency constraint, row locks, and conflict checks protect concurrent and conflicting activation attempts at the database/RPC boundary.
+
+### Trust boundary and security
+
+The new transition is not exposed to normal browser clients:
+
+- `security definer` is used;
+- `search_path` is fixed;
+- execution is restricted to `service_role` only;
+- anonymous and authenticated execution is revoked;
+- direct browser writes remain blocked by the existing RLS/privilege model;
+- RLS remains enabled with authenticated read-only access inside the existing organization/project boundary;
+- anonymous and authenticated direct insert, update, and delete paths remain denied;
+- source and grant fields remain immutable, including `payment_settlement_id`;
+- no client-side secret or payment success flag is trusted.
+
+The activation path only consumes the trusted persisted payment settlement and internal commercial relationships.
+
+### Audit behavior
+
+The transition writes an `entitlement_activated` audit event and includes settlement correlation metadata in the audit payload:
+
+- organization
+- project
+- entitlement
+- payment obligation
+- payment settlement
+- project service
+- activation reference
+
+No secrets are written to audit metadata.
+
+### Delivery boundary
+
+This phase does not initialize delivery activation, implementation, deployment, observation, stabilization, documentation, handover, or ongoing service. The boundary remains:
+
+Settlement = verified
+Entitlement = ACTIVE
+Delivery activation = not automatically created
+
+### Migration and status
+
+Migration file created:
+
+- `supabase/migrations/202610030001_settlement_entitlement_activation.sql`
+
+This migration adds a `payment_settlement_id` link to `public.entitlements` and creates the trusted `activate_entitlement_from_settlement(...)` function. This is the minimum required schema/API bridge for the verified settlement → entitlement transition.
+
+Remote migration status is **UNVERIFIED**. The link is correctly configured for project `icoyljzozkwdeegodnly` (`Blockwavelab`), and authenticated `supabase projects list` access succeeds. The project currently reports `status: INACTIVE`; consequently, both `supabase migration list --linked` and `supabase db push --linked` fail during login-role initialization with `LegacyDbConfigLoginRoleStatusError` and a connection timeout. The migration was not deployed through a bypass, and remote application of `202610030001` is not claimed. The deployed function inventory independently reports `stripe-webhook` as `ACTIVE`, but that does not prove the database migration is applied.
+
+### Runtime tests
+
+The following runtime tests remain deferred because the trusted Stripe runtime is not available in this environment:
+
+- genuine Stripe Checkout session creation
+- real Stripe `checkout.session.completed` webhook delivery
+- real Stripe signature verification
+- real settlement creation from a provider event
+- real settlement → entitlement activation over an actual provider event
+
+The implementation was validated structurally and safely, not with fabricated provider events or synthetic success records.
+
+### Validation results
+
+### Audit and delivery boundary
+
+Activation records an `entitlement_activated` audit event with internal settlement correlation only. Audit metadata contains no Stripe secret, webhook secret, service-role key, or credential material.
+
+The resulting lifecycle boundary is:
+
+Verified settlement
+→ active entitlement
+→ stop
+
+No settlement path calls or creates delivery activation, implementation, deployment, observation, stabilization, documentation, handover, or ongoing service. Delivery activation remains Phase 15.18H and is intentionally not started here.
+
+### Validation results
+
+The code and project validation commands were executed as follows:
+
+- `npm run typecheck -- --pretty false` → PASS
+- `npm run lint` → PASS with two pre-existing SEO warnings, zero errors
+- `npm run build` → PASS
+- `git diff --check` → PASS
+- `supabase migration list --linked` → BLOCKED because the correctly linked remote project reports `INACTIVE`, causing Supabase CLI login-role initialization to time out; remote migration status remains unverified
+- `supabase functions list --output json` → PASS; `stripe-webhook` is `ACTIVE` with `verify_jwt: false`, relying on Stripe signature verification
+- `supabase db lint --local` → BLOCKED because local Postgres is not running on `127.0.0.1:54322`
+- no authenticated identity was available for identity-based runtime tests
+
+### Deferred tests and exact blockers
+
+- genuine Stripe Checkout and webhook execution;
+- real settlement creation from a provider event;
+- live settlement-to-entitlement activation;
+- replay and concurrent activation runtime tests;
+- authenticated browser authorization tests;
+- remote schema verification and migration deployment.
+
+The exact blockers are:
+
+1. The correctly linked Supabase project `icoyljzozkwdeegodnly` currently reports `INACTIVE`; its login-role initialization fails with `LegacyDbConfigLoginRoleStatusError` and connection timeout, preventing migration ledger verification and normal deployment.
+2. `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are absent from the trusted runtime.
+3. The remote Edge Function runtime remains subject to the existing `WORKER_RESOURCE_LIMIT` condition.
+4. Local Supabase database lint requires a running local Postgres container, which is unavailable.
+
+### Final verdict for this phase
+
+`PASS WITH DEFERRED RUNTIME TESTS`
+
+The local settlement → entitlement implementation is hardened and structurally reviewed, but remote migration deployment cannot be confirmed because the Supabase CLI login-role timeout blocks the required ledger check. This verdict does not claim that `202610030001` is deployed remotely. Phase 15.18H is not started.
+
+## Phase 15.18H — Entitlement to Delivery Activation
+
+### Implementation status
+
+The existing `public.delivery_activations` table and `public.activate_delivery(...)` boundary were inspected and reused. The original foundation already provided the approved delivery vocabulary, service-role-only execution, RLS, immutable source fields, idempotency constraints, OWNER lifecycle controls, and audit integration.
+
+The existing initialization function did not fully validate the settlement-aware entitlement source graph, project-service commercial state, active catalog source records, or deterministic conflicts for an existing entitlement activation. A minimal append-only corrective migration was therefore added:
+
+- `supabase/migrations/202610030002_delivery_activation_integrity.sql`
+
+The migration replaces only `public.activate_delivery(...)`. It does not create a duplicate delivery table, alter approved statuses or stages, change the four pillars, or modify the settlement-to-entitlement implementation.
+
+### Trusted validation boundary
+
+Before creating an activation, the trusted service-role function now validates:
+
+- the actor is the service role and maps to a valid user;
+- the entitlement exists, is `ACTIVE`, is `VERIFIED_COMMERCIAL_EVENT`, and is not expired;
+- entitlement organization, project, project service, payment obligation, proposal, proposal version, and agreement relationships remain consistent;
+- the project exists in the entitlement organization and is not archived;
+- the project service belongs to the project and is in `REQUESTED`, `APPROVED`, `PAYMENT_PENDING`, or `ACTIVE` state;
+- the offering, catalog service, and catalog pillar are active and the offering is within its effective window;
+- the proposal is the accepted current version and includes the project service;
+- an agreement source, when present, is the accepted active version;
+- a linked payment settlement, when present, exists and matches the entitlement, obligation, attempt, organization, project, proposal, agreement, amount, and currency.
+
+The entitlement row and existing activation rows are locked during validation. Existing activations for the entitlement return deterministically only when identity and source relationships match; conflicting reference or idempotency values fail safely. Database uniqueness constraints remain the final duplicate protection.
+
+### Security, audit, and UI
+
+The corrective function remains `SECURITY DEFINER` with a fixed `search_path`. Execution is revoked from `public`, `anon`, and `authenticated`, and granted only to `service_role`. Existing delivery activation RLS remains enabled: authenticated clients may read within their tenant/project boundary, while direct insert, update, and delete remain denied. Existing immutable source-field triggers remain in place. The client UI remains read-only and exposes no browser delivery activation control.
+
+Activation preserves the existing `ACTIVE` state and `IMPLEMENTATION` initial stage. It records `delivery_activation_activated` through the existing audit mechanism and stores only internal lifecycle context, never provider credentials or secrets.
+
+### Downstream boundary
+
+Initializing delivery activation does not initialize implementation, deployment, observation, stabilization, documentation, handover, or ongoing service. Those remain separate lifecycle boundaries. Phase 15.18I is not started.
+
+### Remote status and deferred verification
+
+The corrective migration is locally present and structurally verified. Remote deployment and schema verification remain deferred because the linked Supabase project `icoyljzozkwdeegodnly` currently reports `INACTIVE`; `supabase migration list --linked` cannot initialize the login role and times out. No remote application of `202610030002` is claimed. Stripe runtime testing and authenticated/database runtime identity tests remain deferred.
+
+### Validation
+
+- delivery activation migration static boundary checks → PASS
+- `npm run typecheck -- --pretty false` → PASS
+- `npm run lint` → PASS with two existing warnings and zero errors
+- `npm run build` → PASS
+- `git diff --check` → PASS
+- `supabase functions list --output json` → PASS; `stripe-webhook` remains `ACTIVE`
+- remote migration list/deployment → BLOCKED by inactive Supabase project
+
+### Final verdict for this phase
+
+`BLOCKED`
+
+The trusted Entitlement → Delivery Activation implementation is locally hardened and validated, but remote migration deployment and database verification cannot be completed while the Supabase project is inactive.
+
+## Phase 15.18I — Commercial to Delivery End-to-End Integrity
+
+### Findings
+
+The inspected commercial chain is implemented through the approved boundaries:
+
+Catalog/project service selection → proposal/version/items → agreement/version/acceptance where required → payment obligation → payment attempt → verified settlement → settlement-backed entitlement → delivery activation.
+
+Existing protections verified locally include immutable issued proposal/agreement history, accepted-current-version checks for payment obligations, payment-attempt amount/currency matching, settlement amount/currency/provider-event and payment-attempt uniqueness, failed/cancelled/expired attempt rejection, settlement-backed entitlement validation, active-entitlement delivery admission, tenant relationship checks, RLS, trusted RPC grants, and correlated audit events.
+
+### Concrete defects and corrective migrations
+
+Two concrete gaps were found and corrected with append-only migrations:
+
+1. `202610030002_delivery_activation_integrity.sql` hardens the existing `activate_delivery(...)` function with full entitlement, obligation, proposal, agreement, settlement, project, project-service, and active catalog validation, row locking, and deterministic duplicate/conflict handling.
+2. `202610030003_commercial_boundary_integrity.sql` hardens agreement acceptance so terminated/expired agreements and invalid idempotency reuse cannot be accepted, and revokes service-role execution from the legacy direct `activate_entitlement(...)` RPC. Settlement-backed entitlement creation must use `activate_entitlement_from_settlement(...)`.
+
+No duplicate tables, providers, stages, statuses, services, pricing, or lifecycle boundaries were introduced. No already-applied migration was edited.
+
+### State safety and tenant isolation
+
+The verified local path rejects failed, cancelled, or expired payment attempts; cancelled or expired obligations; missing or mismatched settlement records; invalid commercial source versions; inactive or expired entitlements; archived or cross-tenant projects; ineligible project-service states; and inactive catalog sources. Provider event and payment-attempt uniqueness, settlement linkage, entitlement linkage, delivery uniqueness, row locks, and conflict checks protect retries and concurrency.
+
+Organization, project, project-service, proposal/version, agreement/version, obligation, attempt, settlement, entitlement, and delivery activation relationships are checked at each trusted transition. No refund or dispute logic was added.
+
+### Security and audit
+
+Browser clients remain unable to directly mutate commercial or lifecycle records. Trusted transitions use fixed `search_path` and appropriate `SECURITY DEFINER` boundaries; anonymous execution is denied, authenticated direct writes remain blocked by RLS, and OWNER controls remain limited to lifecycle status operations. Proposal/agreement/payment/attempt/entitlement/delivery source fields remain immutable through existing triggers and the corrective boundaries.
+
+Settlement, entitlement activation, agreement acceptance, and delivery activation retain existing audit correlation. Audit metadata contains internal identifiers and state context only; no Stripe secrets, signatures, service-role keys, or sensitive provider payloads are recorded.
+
+### Strict downstream boundary
+
+Verification ends at:
+
+Verified settlement → entitlement → delivery activation
+
+Neither corrective migration initializes implementation, deployment, observation, stabilization, documentation, handover, or ongoing service. Phase 15.18J is not started.
+
+### Remote and runtime status
+
+The local chain and corrective migrations are structurally verified. The linked Supabase project `icoyljzozkwdeegodnly` still reports `INACTIVE`; remote migration ledger and schema verification are therefore unavailable. No remote migration synchronization is claimed. Stripe runtime testing remains deferred because trusted Stripe credentials and operational runtime capacity are unavailable.
+
+### Validation
+
+- commercial boundary migration static checks → PASS
+- delivery activation migration static checks → PASS
+- `npm run typecheck -- --pretty false` → PASS
+- `npm run lint` → PASS with two existing warnings and zero errors
+- `npm run build` → PASS
+- `git diff --check` → PASS
+- `supabase functions list --output json` → PASS; `stripe-webhook` remains `ACTIVE`
+- remote migration/schema verification → BLOCKED by inactive Supabase project
+
+### Final verdict for this phase
+
+`BLOCKED`
+
+The commercial chain is locally hardened through delivery activation, but remote migration deployment and database verification remain blocked by the inactive Supabase project. Phase 15.18J is not started.
+
+## Phase 15.18J — Payment Failure, Expiry, and Cancellation Hardening
+
+### Negative-path findings
+
+The existing payment boundaries already reject failed, cancelled, and expired attempts during settlement creation; reject cancelled and expired obligations because settlement requires `PENDING`; enforce immutable amount/currency/source fields; and protect provider-event and payment-attempt uniqueness. The webhook remains restricted to verified `checkout.session.completed` events and settlement creation remains service-role-only.
+
+A concrete state-integrity gap was found: after a settlement existed, the existing obligation and attempt lifecycle functions could still transition the upstream rows to `CANCELLED`, `EXPIRED`, or `FAILED`. That could invalidate the source state after settlement and weaken downstream negative-state guarantees.
+
+### Corrective migration
+
+Added the minimal append-only migration:
+
+- `supabase/migrations/202610030004_payment_failure_expiry_hardening.sql`
+
+It preserves all approved states and transitions while extending the existing immutable mutation triggers so a payment obligation or payment attempt with a verified settlement cannot change lifecycle state. No automatic expiry job, refund, dispute, chargeback, provider, table, or lifecycle stage was introduced.
+
+### State and downstream safety
+
+- `FAILED`, `CANCELLED`, and `EXPIRED` attempts cannot create settlements.
+- `CANCELLED` and `EXPIRED` obligations cannot create settlements or settlement-backed entitlements.
+- A verified settlement cannot be invalidated later by changing its attempt or obligation state.
+- Duplicate provider events and payment attempts remain protected by database uniqueness constraints and trusted RPC checks.
+- Settlement-backed entitlement activation remains service-role-only; the legacy direct entitlement path remains revoked by `202610030003`.
+- Delivery activation still requires an active verified entitlement and validates the commercial/payment source chain through `202610030002`.
+- No implementation, deployment, observation, stabilization, documentation, handover, or ongoing-service initialization occurs.
+
+### Security and audit
+
+RLS, tenant isolation, fixed `search_path`, `SECURITY DEFINER` boundaries, service-role-only settlement/entitlement/delivery paths, revoked anonymous execution, authenticated direct-write denial, immutable source fields, and existing audit correlation remain intact. Failure, cancellation, and expiry transitions continue using the existing payment audit events. No credentials, signatures, or sensitive provider payloads are logged.
+
+### Stripe and remote status
+
+No Stripe credentials or events were requested or fabricated. Live Stripe runtime tests remain deferred. The linked Supabase project `icoyljzozkwdeegodnly` remains `INACTIVE`; remote migration listing, deployment, and database runtime verification remain blocked. No remote synchronization is claimed.
+
+### Validation
+
+- payment failure hardening migration static checks → PASS
+- `npm run typecheck -- --pretty false` → PASS
+- `npm run lint` → PASS with two existing warnings and zero errors
+- `npm run build` → PASS
+- `git diff --check` → PASS
+- `supabase functions list --output json` → PASS; `stripe-webhook` remains `ACTIVE`
+- remote migration/schema/runtime tests → BLOCKED by inactive Supabase project
+
+### Final verdict for this phase
+
+`BLOCKED`
+
+Negative payment paths are locally hardened, but remote migration deployment and database runtime verification remain blocked by the inactive Supabase project. Phase 15.18K is not started.
+
+## Phase 15.18K — Final Security and Tenant Isolation Hardening
+
+### Security findings
+
+The implemented commercial/payment/delivery boundary was reviewed across proposals, proposal versions/items, agreements, agreement versions/acceptances, payment obligations, payment attempts, settlements, entitlements, delivery activations, and audit events. No additional concrete defect requiring a migration was found after the protections in `202610030001` through `202610030004`.
+
+### Tenant isolation and roles
+
+Trusted transitions validate organization, project, project service, proposal/version, agreement/version, obligation, attempt, settlement, entitlement, and delivery relationships. Existing catalog/project access checks and commercial-owner checks preserve the approved `OWNER`, `ADMIN`, `MEMBER`, and project-role model. No role definitions were changed.
+
+Protected tables keep RLS enabled. Authenticated clients have scoped read access where approved and direct insert/update/delete denied. Audit events are not client-readable or client-writable. Anonymous execution is denied for protected RPCs, and service-role-only transitions remain limited to verified settlement creation, settlement-backed entitlement activation, and delivery activation. OWNER lifecycle operations remain guarded by `private.commercial_owner(...)`.
+
+### Immutability and lifecycle bypass protection
+
+Existing immutable triggers protect issued proposal/agreement history, payment obligation source fields, payment attempt source fields, settlement records, entitlement source/grant fields including settlement linkage, and delivery activation source/grant fields. `202610030004` additionally prevents settled obligations and attempts from later changing lifecycle state. `202610030003` keeps the legacy direct entitlement activation RPC unavailable to `service_role`; settlement-backed activation remains the trusted path.
+
+The approved sequence remains:
+
+Verified settlement → entitlement → delivery activation → existing downstream lifecycle
+
+No direct browser path, failed/cancelled/expired payment path, or delivery activation path bypasses that sequence. Delivery activation does not initialize any later lifecycle stage.
+
+### Idempotency, concurrency, and audit security
+
+Provider-event, payment-attempt, obligation, agreement-acceptance, entitlement-settlement, entitlement-idempotency, and delivery-activation uniqueness constraints remain in place. Trusted functions use row locks and deterministic conflict handling where required. Audit records remain tenant/project correlated, client writes are denied, and metadata contains internal references only; Stripe secrets, webhook signatures, credentials, and sensitive provider payloads are excluded.
+
+### Stripe boundary and remote status
+
+The webhook preserves raw-body signature verification, fails closed when secrets/configuration are missing, accepts only `checkout.session.completed`, and keeps Stripe secrets server-only. No live Stripe test or credential configuration was attempted.
+
+The linked Supabase project `icoyljzozkwdeegodnly` remains `INACTIVE`. Remote migration, RLS, grant, function-definition, and runtime verification are deferred; no remote synchronization is claimed. No corrective migration was created in Phase 15.18K.
+
+### Validation
+
+- local security/static inspection → PASS
+- `npm run typecheck -- --pretty false` → PASS
+- `npm run lint` → PASS with two existing warnings and zero errors
+- `npm run build` → PASS
+- `git diff --check` → PASS
+- `supabase functions list --output json` → PASS; `stripe-webhook` remains `ACTIVE`
+- remote database/security verification → BLOCKED by inactive Supabase project
+
+### Final verdict for this phase
+
+`BLOCKED`
+
+Local security and tenant-isolation hardening is complete with no new migration required. Remote verification remains unavailable while the linked Supabase project is inactive. Phase 15.18L is not started.
+
+## Phase 15.18L — Final Production-Readiness Closure
+
+### Final local status
+
+The commercial/payment/delivery implementation is locally complete and internally consistent through the approved sequence:
+
+Catalog → service selection → proposal → proposal acceptance → agreement when required → payment obligation → payment attempt → Stripe Checkout → verified webhook → settlement → entitlement → delivery activation → existing downstream delivery lifecycle.
+
+The final inspection confirmed:
+
+- migrations `202610030001` through `202610030004` are present and correctly ordered;
+- settlement creation is service-role-only, amount/currency/source constrained, and uniquely protected by provider event and payment attempt;
+- the webhook preserves raw-body signature verification, fails closed on missing secrets, and accepts only `checkout.session.completed`;
+- settlement-backed entitlement activation is the trusted path and the legacy direct entitlement grant remains revoked;
+- delivery activation requires a valid active verified entitlement and consistent upstream commercial/payment relationships;
+- failed, cancelled, or expired payment states cannot progress and settled obligations/attempts cannot later be invalidated;
+- RLS, fixed `search_path`, `SECURITY DEFINER`, grants, immutable triggers, OWNER controls, idempotency, row locking, and tenant isolation remain intact;
+- no fake payment success path, automatic lifecycle progression, browser activation shortcut, or downstream auto-initialization exists.
+
+No new migration or schema/code correction was required in Phase 15.18L. No service categories, pricing, billing modes, providers, lifecycle stages, refund/dispute systems, background jobs, or approved business decisions were added or changed.
+
+### Remote and runtime status
+
+The linked Supabase project `icoyljzozkwdeegodnly` remains `INACTIVE`. Per scope, remote migration, grant/RLS/function-definition, and runtime identity verification were stopped after the single status check. No remote migrations are claimed as applied. The deployed `stripe-webhook` function is independently reported `ACTIVE`.
+
+Live Stripe checkout/webhook execution, real settlement replay, authenticated database identity tests, and remote migration verification remain deferred solely because the Supabase project is inactive and trusted provider/runtime execution is unavailable. No credentials or fabricated events were used.
+
+### Final validation
+
+- complete production-closure static checks → PASS
+- migration order check → PASS for `202610030001` through `202610030004`
+- `npm run typecheck -- --pretty false` → PASS
+- `npm run lint` → PASS with two existing warnings and zero errors
+- `npm run build` → PASS
+- `git diff --check` → PASS
+- `supabase functions list --output json` → PASS; `stripe-webhook` is `ACTIVE`
+- `git status --short --untracked-files=all` → inspected; generated sitemap noise restored
+
+### Final verdict for this phase
+
+`BLOCKED`
+
+The implementation and local security/readiness checks pass. Required remote verification remains blocked by the inactive Supabase project. No phase after 15.18L was started.
+
 ## Migration
 
 

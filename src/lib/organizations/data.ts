@@ -293,6 +293,7 @@ type EntitlementRow = {
   project_id: string;
   project_service_id: string;
   payment_obligation_id: string;
+  payment_settlement_id: string | null;
   proposal_id: string;
   proposal_version_id: string;
   agreement_id: string | null;
@@ -606,6 +607,7 @@ function mapEntitlement(row: EntitlementRow): Entitlement {
     projectId: row.project_id,
     projectServiceId: row.project_service_id,
     paymentObligationId: row.payment_obligation_id,
+    paymentSettlementId: row.payment_settlement_id,
     proposalId: row.proposal_id,
     proposalVersionId: row.proposal_version_id,
     agreementId: row.agreement_id,
