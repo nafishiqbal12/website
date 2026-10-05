@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button, Container, StatusIndicator } from './ui';
 import { cn } from '../lib/cn';
+import { useAuth } from '../lib/auth/useAuth';
 
 interface NavigationProps {
   currentPage: string;
@@ -9,6 +10,7 @@ interface NavigationProps {
 }
 
 export default function Navigation({ currentPage, onNavigate }: NavigationProps) {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
@@ -17,6 +19,9 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
     { name: 'AUTOMATE', path: 'automate' },
     { name: 'OPERATE', path: 'operate' },
     { name: 'GROW', path: 'grow' },
+    { name: 'Docs', path: 'docs' },
+    { name: 'Blog', path: 'blog' },
+    { name: 'Pricing', path: 'pricing' },
   ];
 
   const handleNavigate = (path: string) => {
@@ -80,7 +85,13 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
                 {item.name}
               </button>
             ))}
-            <Button onClick={() => handleNavigate('build')} size="sm">Explore Pillars</Button>
+            {user ? <>
+              <Button variant="outline" onClick={() => handleNavigate('/profile')} size="sm">Profile</Button>
+              <Button onClick={() => handleNavigate('/dashboard')} size="sm">Dashboard</Button>
+            </> : <>
+              <Button variant="outline" onClick={() => handleNavigate('/login')} size="sm">Log in</Button>
+              <Button onClick={() => handleNavigate('/signup')} size="sm">Start Free Trial</Button>
+            </>}
           </div>
 
           <button
@@ -110,7 +121,13 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
                 {item.name}
               </button>
             ))}
-            <Button full onClick={() => handleNavigate('build')}>Explore Pillars</Button>
+            {user ? <>
+              <Button full variant="outline" onClick={() => handleNavigate('/profile')}>Profile</Button>
+              <Button full onClick={() => handleNavigate('/dashboard')}>Dashboard</Button>
+            </> : <>
+              <Button full variant="outline" onClick={() => handleNavigate('/login')}>Log in</Button>
+              <Button full onClick={() => handleNavigate('/signup')}>Start Free Trial</Button>
+            </>}
           </Container>
         </div>
       )}

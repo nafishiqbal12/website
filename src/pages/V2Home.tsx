@@ -1,5 +1,6 @@
 import { Bot, CloudCog, Cog, LifeBuoy, Radar, Rocket, ShieldCheck, Sparkles } from 'lucide-react';
 import { HeroShell, PageShell } from '../components/shells';
+import { useAuth } from '../lib/auth/useAuth';
 import {
   Alert,
   Badge,
@@ -89,6 +90,12 @@ const LIFECYCLE_STEPS = [
 ] as const;
 
 export default function V2Home({ onNavigate }: HomeProps) {
+  const { user } = useAuth();
+  const primaryPath = user ? '/dashboard' : '/signup';
+  const secondaryPath = user ? '/profile' : '/login';
+  const primaryLabel = user ? 'Open Dashboard' : 'Start Free Trial';
+  const secondaryLabel = user ? 'View Profile' : 'Log in';
+
   return (
     <div className="pt-16">
       <HeroShell tone="build" className="pb-14 sm:pb-20" aria-label="BlockWaveLab hero">
@@ -104,8 +111,8 @@ export default function V2Home({ onNavigate }: HomeProps) {
             We help Web3 teams build infrastructure, automate workflows, operate production systems, and support growth with practical lifecycle execution.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3 animate-enter-delay-3">
-            <Button onClick={() => onNavigate('/build')}>Discuss your project</Button>
-            <Button variant="outline" onClick={() => onNavigate('/automate')}>Explore service lanes</Button>
+            <Button onClick={() => onNavigate(primaryPath)}>{primaryLabel}</Button>
+            <Button variant="outline" onClick={() => onNavigate(secondaryPath)}>{secondaryLabel}</Button>
           </div>
           <div className="mt-7 flex flex-wrap justify-center gap-5 text-left">
             <StatusIndicator tone="online" label="BUILD and OPERATE workflows" />
@@ -300,13 +307,11 @@ export default function V2Home({ onNavigate }: HomeProps) {
         <section className="mt-16" aria-label="Primary call to action">
           <Container className="bw-shell bw-grid-noise p-8 sm:p-10 text-center">
             <p className="text-sm font-semibold tracking-[0.2em] uppercase text-cyan-200">Start with a suitable engagement</p>
-            <h2 className="mt-3 text-3xl font-semibold text-slate-100 sm:text-4xl">Plan the right build, automate, operate, and grow path</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-slate-300">
-              Discuss your project goals, review the relevant service categories, and define a practical implementation scope.
-            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate-100 sm:text-4xl">Ready to build, automate, and operate your Web3 project?</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-300">Start with BlockWaveLab&apos;s 3-day free trial.</p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <Button onClick={() => onNavigate('/build')}>Discuss your project</Button>
-              <Button variant="secondary" onClick={() => onNavigate('/grow')}>Explore services</Button>
+              <Button onClick={() => onNavigate(primaryPath)}>{primaryLabel}</Button>
+              <Button variant="secondary" onClick={() => onNavigate(secondaryPath)}>{secondaryLabel}</Button>
               <Link href="mailto:hello@blockwavelab.com" className="inline-flex items-center rounded-xl border border-slate-600 px-4 py-2.5 text-slate-100 hover:bg-slate-800/60">
                 Contact: hello@blockwavelab.com
               </Link>

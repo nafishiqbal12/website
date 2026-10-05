@@ -6,7 +6,10 @@ import BuildPage from '../pages/BuildPage';
 import AutomatePage from '../pages/AutomatePage';
 import OperatePage from '../pages/OperatePage';
 import GrowPage from '../pages/GrowPage';
+import DocsPage from '../pages/DocsPage';
+import PricingPage from '../pages/PricingPage';
 import { ForgotPasswordPage, LoginPage, ResetPasswordPage, SignupPage } from '../pages/AuthPages';
+import PaymentResult from '../pages/PaymentResult';
 import PlatformApp from '../pages/platform/PlatformApp';
 import { getPostBySlug, type Post } from '../lib/blog';
 import { getSeoForRoute } from './seoConfig';
@@ -305,6 +308,10 @@ export default function AppRouter() {
         return <OperatePage onNavigate={navigate} />;
       case 'grow':
         return <GrowPage onNavigate={navigate} />;
+      case 'docs':
+        return <DocsPage path={route.path} onNavigate={navigate} />;
+      case 'pricing':
+        return <PricingPage onNavigate={navigate} />;
       case 'login':
         return <LoginPage onNavigate={navigate} />;
       case 'signup':
@@ -313,6 +320,10 @@ export default function AppRouter() {
         return <ForgotPasswordPage onNavigate={navigate} />;
       case 'reset-password':
         return <ResetPasswordPage onNavigate={navigate} />;
+      case 'payment-success':
+        return <PaymentResult kind="success" />;
+      case 'payment-cancel':
+        return <PaymentResult kind="cancel" />;
       case 'profile':
       case 'dashboard':
       case 'organizations':

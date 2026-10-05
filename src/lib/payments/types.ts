@@ -44,7 +44,7 @@ export type SettlementValidationInput = {
   paymentAttemptId: string;
   amountMinor: string;
   currency: 'USD';
-  provider: 'stripe';
+  provider: PaymentProviderKey;
   providerEventId: string;
   providerEventType: string;
   providerCheckoutSessionId?: string | null;
@@ -53,5 +53,5 @@ export type SettlementValidationInput = {
 };
 
 export type PaymentSettlementResult =
-  | { ok: true; provider: 'stripe'; settlementId: string; paymentAttemptId: string; paymentObligationId: string; providerEventId: string; status: 'VERIFIED' }
+  | { ok: true; provider: PaymentProviderKey; settlementId: string; paymentAttemptId: string; paymentObligationId: string; providerEventId: string; status: 'VERIFIED' }
   | { ok: false; error: PaymentProviderError };

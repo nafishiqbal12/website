@@ -2,6 +2,7 @@ import type { PaymentAttempt, PaymentObligation } from '../organizations/types';
 import type { CreateCheckoutRequest, CreateCheckoutResult, PaymentVerificationResult, PaymentWebhookVerificationResult, PaymentSettlementResult, SettlementValidationInput } from './types';
 import type { PaymentProviderAdapter } from './providerAdapter';
 import { createStripeProviderAdapter } from './stripeProviderAdapter';
+import { supabase } from '../supabase/client';
 
 const notConfigured = (message: string) => ({
   ok: false as const,
@@ -11,6 +12,22 @@ const notConfigured = (message: string) => ({
 export function createProviderNeutralPaymentService(adapter: PaymentProviderAdapter | null = null) {
   return {
     async createCheckoutSession(_request: CreateCheckoutRequest, obligation: PaymentObligation, attempt: PaymentAttempt): Promise<CreateCheckoutResult> {
+      if (typeof window !== 'undefined' && import.meta.env.VITE_PAYMENT_PROVIDER === 'polar' && supabase) {
+        const { data, error } = await supabase.functions.invoke('polar-checkout', {
+          body: {
+            paymentObligationId: obligation.id,
+            paymentAttemptId: attempt.id,
+            idempotencyKey: attempt.idempotencyKey,
+          },
+        });
+        if (error) {
+          return {
+            ok: false,
+            error: { code: 'PROVIDER_ERROR', message: error.message, retryable: false },
+          };
+        }
+        return data as CreateCheckoutResult;
+      }
       if (!adapter) return notConfigured('Payment checkout is unavailable until a payment provider is configured and integrated.');
       return adapter.createCheckoutSession({ obligation, attempt });
     },

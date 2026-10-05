@@ -7,7 +7,7 @@ export const TARGET_KEYWORDS = [
   'managed devops and ai operations',
 ].join(', ');
 
-export type StaticPage = 'home' | 'build' | 'automate' | 'operate' | 'grow';
+export type StaticPage = 'home' | 'build' | 'automate' | 'operate' | 'grow' | 'docs' | 'pricing';
 
 export type DynamicPage =
   | 'cases'
@@ -18,9 +18,11 @@ export type DynamicPage =
 
 export type AuthPage = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'profile';
 
+export type PaymentPage = 'payment-success' | 'payment-cancel';
+
 export type AppPage = 'dashboard' | 'organizations' | 'organization' | 'organization-members' | 'organization-invitations' | 'projects' | 'project' | 'project-members' | 'proposals' | 'proposal' | 'agreements' | 'agreement';
 
-export type PageKey = StaticPage | DynamicPage | AuthPage | AppPage;
+export type PageKey = StaticPage | DynamicPage | AuthPage | PaymentPage | AppPage;
 
 export type RouteState = {
   page: PageKey;
@@ -35,6 +37,8 @@ export const PATH_BY_PAGE: Record<StaticPage, string> = {
   automate: '/automate',
   operate: '/operate',
   grow: '/grow',
+  docs: '/docs',
+  pricing: '/pricing',
 };
 
 export const TAG_ROUTE_PREFIX = '/blog/tag/';
@@ -127,6 +131,10 @@ export function getRouteFromPath(pathname: string): RouteState {
     }
   }
 
+  if (normalized === '/docs' || normalized === '/docs/services' || normalized === '/docs/lifecycle' || normalized.startsWith('/docs/services/')) {
+    return { page: 'docs', path: normalized };
+  }
+
   switch (normalized) {
     case '/':
       return { page: 'home', path: '/' };
@@ -138,6 +146,8 @@ export function getRouteFromPath(pathname: string): RouteState {
       return { page: 'operate', path: '/operate' };
     case '/grow':
       return { page: 'grow', path: '/grow' };
+    case '/pricing':
+      return { page: 'pricing', path: '/pricing' };
     case '/cases':
     case '/case-studies':
       return { page: 'cases', path: '/case-studies' };
@@ -151,6 +161,10 @@ export function getRouteFromPath(pathname: string): RouteState {
       return { page: 'forgot-password', path: '/forgot-password' };
     case '/reset-password':
       return { page: 'reset-password', path: '/reset-password' };
+    case '/payment/success':
+      return { page: 'payment-success', path: '/payment/success' };
+    case '/payment/cancel':
+      return { page: 'payment-cancel', path: '/payment/cancel' };
     case '/profile':
       return { page: 'profile', path: '/profile' };
     case '/dashboard':
@@ -164,12 +178,12 @@ export function getRouteFromPath(pathname: string): RouteState {
   }
 }
 
-export function getNavPage(routePage: PageKey): StaticPage {
+export function getNavPage(routePage: PageKey): string {
   switch (routePage) {
     case 'blog':
     case 'blog-post':
     case 'blog-tag':
-      return 'grow';
+      return 'blog';
     case 'cases':
     case 'case-study':
       return 'operate';
@@ -179,6 +193,9 @@ export function getNavPage(routePage: PageKey): StaticPage {
     case 'reset-password':
     case 'profile':
       return 'home';
+    case 'docs':
+    case 'pricing':
+      return routePage;
     case 'dashboard':
     case 'organizations':
     case 'organization':

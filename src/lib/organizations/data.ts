@@ -1129,6 +1129,20 @@ export async function createPaymentAttempt(input: {
   return { attempt: data ? mapPaymentAttempt(data as PaymentAttemptRow) : null, error };
 }
 
+export async function createClientPaymentAttempt(input: {
+  paymentObligationId: string;
+  idempotencyKey: string;
+  commercialSnapshot?: Record<string, unknown>;
+}): Promise<{ attempt: PaymentAttempt | null; error: Error | null }> {
+  if (!supabase) return { attempt: null, error: configurationError() };
+  const { data, error } = await supabase.rpc('create_client_payment_attempt', {
+    p_payment_obligation_id: input.paymentObligationId,
+    p_idempotency_key: input.idempotencyKey,
+    p_commercial_snapshot: input.commercialSnapshot ?? {},
+  });
+  return { attempt: data ? mapPaymentAttempt(data as PaymentAttemptRow) : null, error };
+}
+
 export async function transitionPaymentAttempt(input: {
   paymentAttemptId: string;
   nextStatus: Exclude<PaymentAttemptStatus, 'CREATED'>;

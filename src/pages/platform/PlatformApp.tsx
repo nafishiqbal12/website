@@ -24,7 +24,7 @@ import {
   createAgreement,
   createAgreementVersion,
   createProject,
-  createPaymentAttempt,
+  createClientPaymentAttempt,
   createProposal,
   createProposalVersion,
   getProject,
@@ -118,6 +118,25 @@ function roleTone(role: string) {
 
 function statusTone(status: string) {
   return status === 'ACTIVE' ? 'success' : status === 'PENDING' ? 'warning' : 'default';
+}
+
+function formatMinorAmount(amountMinor: string, currency: string) {
+  const amount = Number(amountMinor) / 100;
+  if (!Number.isFinite(amount)) return `${amountMinor} ${currency}`;
+  return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(amount);
+}
+
+function paymentStateLabel(obligation: PaymentObligation, attempts: PaymentAttempt[], hasActiveEntitlement: boolean) {
+  if (hasActiveEntitlement) return 'Payment completed';
+  if (obligation.status === 'CANCELLED') return 'Payment cancelled';
+  if (obligation.status === 'EXPIRED') return 'Payment expired';
+  const latestAttempt = attempts[attempts.length - 1];
+  if (latestAttempt?.status === 'FAILED') return 'Payment failed';
+  if (latestAttempt?.status === 'CANCELLED') return 'Payment cancelled';
+  if (latestAttempt?.status === 'EXPIRED') return 'Payment expired';
+  if (latestAttempt?.status === 'PROCESSING') return 'Payment processing';
+  if (latestAttempt?.status === 'CREATED') return 'Payment processing';
+  return 'Payment required';
 }
 
 function PlatformShell({ children, active, onNavigate }: { children: ReactNode; active: string; onNavigate: (target: string) => void }) {
@@ -215,11 +234,43 @@ function OrganizationSummary({ organization, membership }: { organization: Organ
 function Dashboard({ data, onNavigate }: { data: PlatformData; onNavigate: (target: string) => void }) {
   const membership = data.memberships.find((item) => item.userId === data.currentUserId);
   if (!data.selectedOrganization) return <><PageHeader eyebrow="Dashboard" title="Your delivery workspace" description="Create an organization to begin coordinating projects and access." /><CreateOrganization onCreated={data.refresh} /></>;
-  return <><PageHeader eyebrow="Dashboard" title={`Good to see you in ${data.selectedOrganization.name}`} description="A focused view of the organizations and delivery projects you can access." action={<OrganizationPicker data={data} onNavigate={onNavigate} />} /><div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]"><OrganizationSummary organization={data.selectedOrganization} membership={membership} /><Card><div className="flex items-center justify-between"><div><p className="text-sm text-slate-400">Accessible projects</p><p className="mt-2 text-4xl font-semibold text-slate-50">{data.projects.length}</p></div><FolderKanban className="text-cyan-300" size={28} /></div><Button className="mt-6" variant="outline" size="sm" onClick={() => onNavigate('/projects')}>View projects <ArrowRight size={15} /></Button></Card></div><section className="mt-8"><div className="mb-4 flex items-center justify-between"><h2 className="text-xl font-semibold">Recent projects</h2><button className="bw-focus text-sm text-cyan-300" onClick={() => onNavigate('/projects')}>Open all</button></div>{data.projects.length ? <div className="grid gap-4 md:grid-cols-2">{data.projects.slice(0, 4).map((project) => <ProjectCard key={project.id} project={project} onOpen={() => onNavigate(`/projects/${project.id}`)} />)}</div> : <EmptyState title="No projects yet" message="Projects will appear here when your organization starts a delivery engagement." />}</section></>;
+  return <><PageHeader eyebrow="Dashboard" title={`Good to see you in ${data.selectedOrganization.name}`} description="See what each project needs next, from service request through delivery." action={<OrganizationPicker data={data} onNavigate={onNavigate} />} /><div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]"><OrganizationSummary organization={data.selectedOrganization} membership={membership} /><Card><div className="flex items-center justify-between"><div><p className="text-sm text-slate-400">Accessible projects</p><p className="mt-2 text-4xl font-semibold text-slate-50">{data.projects.length}</p></div><FolderKanban className="text-cyan-300" size={28} /></div><Button className="mt-6" variant="outline" size="sm" onClick={() => onNavigate('/projects')}>View projects <ArrowRight size={15} /></Button></Card></div><section className="mt-8"><div className="mb-4 flex items-center justify-between"><h2 className="text-xl font-semibold">My projects</h2><button className="bw-focus text-sm text-cyan-300" onClick={() => onNavigate('/projects')}>Open all</button></div>{data.projects.length ? <div className="grid gap-4 md:grid-cols-2">{data.projects.slice(0, 4).map((project) => <ClientProjectCard key={project.id} project={project} onOpen={() => onNavigate(`/projects/${project.id}`)} />)}</div> : <EmptyState title="Create your first project" message="Start a project to choose services and receive a proposal." />}</section></>;
 }
 
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
   return <Card interactive className="cursor-pointer" onClick={onOpen}><div className="flex items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{project.slug}</p><h3 className="mt-2 text-lg font-semibold text-slate-50">{project.name}</h3></div><Badge tone={statusTone(project.status)}>{project.status}</Badge></div><p className="mt-4 text-sm text-slate-400">{project.description || 'No project description yet.'}</p><div className="mt-5 flex items-center justify-between text-xs text-slate-500"><span>{project.deliveryStage.replace(/_/g, ' ')}</span><ArrowRight size={15} /></div></Card>;
+}
+
+function ClientProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
+  const [services, setServices] = useState<ProjectService[]>([]);
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [obligations, setObligations] = useState<PaymentObligation[]>([]);
+  const [entitlements, setEntitlements] = useState<Entitlement[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.all([
+      listProjectServices(project.id),
+      listProposals(project.organizationId, project.id),
+      listPaymentObligations(project.organizationId, project.id),
+      listProjectEntitlements(project.id),
+    ]).then(([serviceResult, proposalResult, obligationResult, entitlementResult]) => {
+      if (cancelled) return;
+      setServices(serviceResult.services);
+      setProposals(proposalResult.proposals);
+      setObligations(obligationResult.obligations);
+      setEntitlements(entitlementResult.entitlements);
+    });
+    return () => { cancelled = true; };
+  }, [project.id, project.organizationId]);
+
+  const activeEntitlement = entitlements.some((item) => item.status === 'ACTIVE');
+  const payableObligation = obligations.find((item) => item.status === 'PENDING');
+  const acceptedProposal = proposals.find((item) => item.status === 'ACCEPTED');
+  const issuedProposal = proposals.find((item) => ['SENT', 'VIEWED'].includes(item.status));
+  const nextAction = activeEntitlement ? 'View delivery status' : payableObligation ? 'Pay Now' : issuedProposal ? 'Review proposal' : acceptedProposal ? 'Payment preparing' : services.length ? 'Proposal pending' : 'Select services';
+
+  return <Card interactive className="cursor-pointer" onClick={onOpen}><div className="flex items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{project.slug}</p><h3 className="mt-2 text-lg font-semibold text-slate-50">{project.name}</h3></div><Badge tone={statusTone(project.status)}>{project.status}</Badge></div><p className="mt-4 text-sm text-slate-400">{services.length ? `${services.length} selected service${services.length === 1 ? '' : 's'}` : 'Choose services for this project'}</p><div className="mt-4 flex items-center justify-between border-t border-slate-800 pt-4 text-xs"><span className="text-slate-500">{project.deliveryStage.replace(/_/g, ' ')}</span><span className="font-medium text-cyan-300">{nextAction}</span></div></Card>;
 }
 
 function OrganizationsPage({ data, onNavigate }: { data: PlatformData; onNavigate: (target: string) => void }) {
@@ -331,19 +382,19 @@ function ProjectServicesPanel({ project, canManage, data }: { project: Project; 
       <div>
         <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Service selection</p>
         <h2 className="mt-2 text-xl font-semibold">Project services</h2>
-        <p className="mt-2 max-w-2xl text-sm text-slate-400">Request an available service offering for this project. This does not approve a proposal, complete payment, grant entitlement, or activate delivery.</p>
+        <p className="mt-2 max-w-2xl text-sm text-slate-400">Choose the service you want to discuss. We will prepare a proposal before any payment is requested.</p>
       </div>
-      <Badge tone="info">REQUESTED only</Badge>
+      <Badge tone="info">Start here</Badge>
     </div>
     {isLoading ? <div className="mt-5"><LoadingState label="Loading available services…" /></div> : <>
       {canManage && offerings.length ? <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">
         <label className="block min-w-0 flex-1"><span className="mb-2 block text-sm font-medium text-slate-200">Available offering</span><select className={fieldClass} value={selectedOfferingId} onChange={(event) => setSelectedOfferingId(event.target.value)}><option value="">Choose an active offering</option>{offerings.filter((offering) => !selectedOfferingIds.has(offering.id)).map((offering) => { const service = services.find((item) => item.id === offering.serviceId); const pillar = pillars.find((item) => item.id === service?.pillarId); return <option key={offering.id} value={offering.id}>{pillar?.code ?? 'PILLAR'} · {service?.name ?? 'Service'} · {offering.name}</option>; })}</select></label>
-        <Button disabled={!selectedOfferingId || isSelecting} onClick={selectOffering}>{isSelecting ? 'Requesting…' : 'Request service'} <Plus size={16} /></Button>
+        <Button disabled={!selectedOfferingId || isSelecting} onClick={selectOffering}>{isSelecting ? 'Requesting…' : 'Request Service'} <Plus size={16} /></Button>
       </div> : null}
       {error ? <div className="mt-4"><Alert title="Service selection unavailable" tone="danger">{error}</Alert></div> : null}
-      {selectedServices.length ? <div className="mt-6 grid gap-3 md:grid-cols-2">{selectedServices.map((selection) => { const offering = offerings.find((item) => item.id === selection.offeringId); const service = services.find((item) => item.id === offering?.serviceId); const pillar = pillars.find((item) => item.id === service?.pillarId); return <div key={selection.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{pillar?.code ?? 'SERVICE'}</p><h3 className="mt-1 font-semibold text-slate-100">{service?.name ?? 'Selected service'}</h3><p className="mt-1 text-sm text-slate-400">{offering?.name ?? 'Offering'}</p></div><Badge tone={statusTone(selection.status)}>{selection.status}</Badge></div><p className="mt-3 text-xs text-slate-500">Selection only. Commercial approval and delivery activation are separate future steps.</p></div>; })}</div> : <EmptyState title="No services selected" message={canManage ? 'Choose an active offering to request the first service for this project.' : 'No project services have been requested for this project.'} />}
+      {selectedServices.length ? <div className="mt-6 grid gap-3 md:grid-cols-2">{selectedServices.map((selection) => { const offering = offerings.find((item) => item.id === selection.offeringId); const service = services.find((item) => item.id === offering?.serviceId); const pillar = pillars.find((item) => item.id === service?.pillarId); return <div key={selection.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wide text-cyan-300">{pillar?.code ?? 'SERVICE'}</p><h3 className="mt-1 font-semibold text-slate-100">{service?.name ?? 'Selected service'}</h3><p className="mt-1 text-sm text-slate-400">{offering?.name ?? 'Offering'}</p></div><Badge tone={statusTone(selection.status)}>{selection.status === 'REQUESTED' ? 'Requested' : selection.status}</Badge></div><p className="mt-3 text-xs text-slate-500">Next step: review the proposal when it is issued.</p></div>; })}</div> : <EmptyState title="Choose a service to begin" message={canManage ? 'Select an available service, then click Request Service.' : 'No service has been requested for this project yet.'} />}
     </>}
-  </Card>{commercialData ? <><CommercialPanel project={project} data={commercialData} /><PaymentObligationPanel project={project} data={commercialData} /><EntitlementPanel project={project} /><DeliveryActivationPanel project={project} /><ImplementationPanel project={project} /><DeploymentPanel project={project} /><ObservationPanel project={project} /><StabilizationPanel project={project} /><HandoverPanel project={project} /><OngoingServicePanel project={project} /></> : null}</>;
+  </Card>{commercialData ? <><Card className="xl:col-span-2 border-cyan-300/20 bg-cyan-300/[0.04]"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Your next steps</p><h2 className="mt-2 text-xl font-semibold text-slate-50">Services -&gt; Proposal -&gt; Payment -&gt; Delivery</h2><p className="mt-2 max-w-3xl text-sm text-slate-400">Request the services you need, review the proposal from BlockWaveLab, pay securely when payment is ready, then follow delivery progress here.</p></Card><CommercialPanel project={project} data={commercialData} /><PaymentObligationPanel project={project} data={commercialData} /><EntitlementPanel project={project} /><DeliveryActivationPanel project={project} /><ImplementationPanel project={project} /><DeploymentPanel project={project} /><ObservationPanel project={project} /><StabilizationPanel project={project} /><HandoverPanel project={project} /><OngoingServicePanel project={project} /></> : null}</>;
 }
 
 function CommercialPanel({ project, data }: { project: Project; data: PlatformData }) {
@@ -394,7 +445,7 @@ function CommercialPanel({ project, data }: { project: Project; data: PlatformDa
   useEffect(() => { void loadProposal(); }, [loadProposal]);
   useEffect(() => { void loadAgreement(); }, [loadAgreement]);
 
-  const createAndIssue = async () => {
+    const createAndIssue = async () => {
     if (!canManage) return;
     setSaving(true); setError(null); setMessage(null);
     const proposalResult = await createProposal({ organizationId: project.organizationId, projectId: project.id });
@@ -422,7 +473,7 @@ function CommercialPanel({ project, data }: { project: Project; data: PlatformDa
     setSaving(true); setError(null); setMessage(null);
     const result = await acceptProposal(proposal.id, version.versionNumber);
     setSaving(false);
-    if (result.error) setError(result.error.message); else { setMessage('Proposal version accepted. Payment, entitlement, and delivery remain separate.'); await load(); await loadProposal(); }
+    if (result.error) setError(result.error.message); else { setMessage('Proposal accepted. Your next step is payment when the obligation is ready.'); await load(); await loadProposal(); }
   };
 
   const createAgreementRecord = async () => {
@@ -445,7 +496,7 @@ function CommercialPanel({ project, data }: { project: Project; data: PlatformDa
     setSaving(true); setError(null); setMessage(null);
     const result = await acceptAgreement({ agreementId: agreement.id, agreementVersionId: version.id, idempotencyKey: `accept-${agreement.id}-${version.id}` });
     setSaving(false);
-    if (result.error) setError(result.error.message); else { setMessage('Agreement acceptance recorded. Payment, entitlement, and delivery remain separate.'); await load(); await loadAgreement(); }
+    if (result.error) setError(result.error.message); else { setMessage('Agreement accepted. Your next step is payment when the obligation is ready.'); await load(); await loadAgreement(); }
   };
 
   const currentProposal = proposals.find((item) => item.id === selectedProposalId);
@@ -456,8 +507,10 @@ function CommercialPanel({ project, data }: { project: Project; data: PlatformDa
 function PaymentObligationPanel({ project, data }: { project: Project; data: PlatformData }) {
   const membership = data.memberships.find((item) => item.userId === data.currentUserId);
   const canManage = membership?.role === 'OWNER';
+  const canPay = membership?.status === 'ACTIVE';
   const [obligations, setObligations] = useState<PaymentObligation[]>([]);
   const [attempts, setAttempts] = useState<PaymentAttempt[]>([]);
+  const [entitlements, setEntitlements] = useState<Entitlement[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [startingCheckoutId, setStartingCheckoutId] = useState<string | null>(null);
@@ -467,8 +520,9 @@ function PaymentObligationPanel({ project, data }: { project: Project; data: Pla
     if (result.error) { setError(result.error.message); return; }
     const attemptResults = await Promise.all(result.obligations.map((obligation) => listPaymentAttempts(obligation.id)));
     const attemptError = attemptResults.find((item) => item.error)?.error;
-    if (attemptError) setError(attemptError.message);
-    else { setError(null); setObligations(result.obligations); setAttempts(attemptResults.flatMap((item) => item.attempts)); }
+    const entitlementResult = await listProjectEntitlements(project.id);
+    if (attemptError || entitlementResult.error) setError(attemptError?.message ?? entitlementResult.error?.message ?? null);
+    else { setError(null); setObligations(result.obligations); setAttempts(attemptResults.flatMap((item) => item.attempts)); setEntitlements(entitlementResult.entitlements); }
   }, [project.id, project.organizationId]);
 
   useEffect(() => { void load(); }, [load]);
@@ -483,14 +537,12 @@ function PaymentObligationPanel({ project, data }: { project: Project; data: Pla
   };
 
   const startCheckout = async (obligation: PaymentObligation) => {
-    if (!canManage || obligation.status !== 'PENDING') return;
+    if (!canPay || obligation.status !== 'PENDING') return;
     setStartingCheckoutId(obligation.id);
     setError(null);
 
-    const attemptResult = await createPaymentAttempt({
+    const attemptResult = await createClientPaymentAttempt({
       paymentObligationId: obligation.id,
-      amountMinor: obligation.amountMinor,
-      currency: obligation.currency,
       idempotencyKey: `checkout-${obligation.id}-${Date.now()}`,
       commercialSnapshot: obligation.commercialSnapshot,
     });
@@ -530,13 +582,12 @@ function PaymentObligationPanel({ project, data }: { project: Project; data: Pla
     <Card className="xl:col-span-2">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Payment obligations</p>
-          <h2 className="mt-2 text-xl font-semibold">Server-authoritative obligations</h2>
-          <p className="mt-2 max-w-3xl text-sm text-slate-400">These records preserve approved commercial amounts and sources. They do not process payment, prove settlement, grant entitlement, or activate delivery.</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Payment</p>
+          <h2 className="mt-2 text-xl font-semibold">Complete your payment</h2>
+          <p className="mt-2 max-w-3xl text-sm text-slate-400">Payment becomes available after your proposal is approved and a payment obligation is created. Your payment is verified by the provider webhook, not by the browser redirect.</p>
         </div>
         <div className="flex gap-2">
-          <Badge tone="info">Provider boundary</Badge>
-          <Badge tone="info">Secure redirect</Badge>
+          <Badge tone="info">Secure checkout</Badge>
         </div>
       </div>
 
@@ -544,51 +595,56 @@ function PaymentObligationPanel({ project, data }: { project: Project; data: Pla
 
       {obligations.length ? (
         <div className="mt-6 space-y-3">
-          {obligations.map((obligation) => (
+          {obligations.map((obligation) => {
+            const obligationAttempts = attempts.filter((attempt) => attempt.paymentObligationId === obligation.id);
+            const hasActiveEntitlement = entitlements.some((entitlement) => entitlement.paymentObligationId === obligation.id && entitlement.status === 'ACTIVE');
+            const paymentLabel = paymentStateLabel(obligation, obligationAttempts, hasActiveEntitlement);
+            return (
             <div key={obligation.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-cyan-300">{obligation.paymentPurpose.replace('_', ' ')}</p>
-                  <p className="mt-1 text-sm text-slate-200">{obligation.scheduleType} · USD minor units: {obligation.amountMinor}</p>
-                  <p className="mt-1 text-xs text-slate-500">Source {obligation.proposalVersionId.slice(0, 8)} · {obligation.agreementVersionId ? `agreement ${obligation.agreementVersionId.slice(0, 8)}` : 'proposal source only'}</p>
+                  <p className="text-xs uppercase tracking-wide text-cyan-300">{obligation.paymentPurpose === 'ONGOING_SERVICE' ? 'Ongoing service' : 'Implementation'}</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-100">{formatMinorAmount(obligation.amountMinor, obligation.currency)}</p>
+                  <p className="mt-1 text-sm text-slate-400">Related proposal {obligation.proposalVersionId.slice(0, 8)} · {obligation.agreementVersionId ? `agreement ${obligation.agreementVersionId.slice(0, 8)}` : 'proposal source'}</p>
                 </div>
-                <Badge tone={statusTone(obligation.status)}>{obligation.status}</Badge>
+                <Badge tone={hasActiveEntitlement ? 'success' : statusTone(obligation.status)}>{paymentLabel}</Badge>
               </div>
 
-              {canManage && obligation.status === 'PENDING' ? (
+              {canPay && obligation.status === 'PENDING' && !hasActiveEntitlement ? (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button variant="outline" onClick={() => startCheckout(obligation)} disabled={startingCheckoutId === obligation.id}>
-                    {startingCheckoutId === obligation.id ? 'Redirecting…' : 'Start secure checkout'}
+                  <Button onClick={() => startCheckout(obligation)} disabled={startingCheckoutId === obligation.id}>
+                    {startingCheckoutId === obligation.id ? 'Opening checkout…' : 'Pay Now'}
                   </Button>
-                  <Button variant="ghost" onClick={() => cancel(obligation)} disabled={cancellingId === obligation.id}>
-                    {cancellingId === obligation.id ? 'Cancelling…' : 'Cancel obligation'}
-                  </Button>
+                  {canManage ? <Button variant="ghost" onClick={() => cancel(obligation)} disabled={cancellingId === obligation.id}>
+                    {cancellingId === obligation.id ? 'Cancelling…' : 'Cancel payment'}
+                  </Button> : null}
                 </div>
               ) : null}
 
               <div className="mt-4 border-t border-slate-800 pt-3">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Payment attempts</p>
-                {attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).length ? (
+                <p className="text-xs uppercase tracking-wide text-slate-500">Payment activity</p>
+                {obligationAttempts.length ? (
                   <div className="mt-2 space-y-2">
-                    {attempts.filter((attempt) => attempt.paymentObligationId === obligation.id).map((attempt) => (
+                    {obligationAttempts.map((attempt) => (
                       <div key={attempt.id} className="rounded-lg border border-slate-800 bg-slate-900/60 p-2">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs text-slate-300">Attempt {attempt.id.slice(0, 8)}</p>
-                          <Badge tone={statusTone(attempt.status)}>{attempt.status}</Badge>
+                          <p className="text-xs text-slate-300">Payment attempt</p>
+                          <Badge tone={statusTone(attempt.status)}>{attempt.status === 'CREATED' || attempt.status === 'PROCESSING' ? 'Processing' : attempt.status === 'FAILED' ? 'Failed' : attempt.status === 'CANCELLED' ? 'Cancelled' : 'Expired'}</Badge>
                         </div>
-                        <p className="mt-1 text-xs text-slate-500">{attempt.amountMinor} minor units · {attempt.currency} · {attempt.createdAt ? new Date(attempt.createdAt).toLocaleString() : 'timestamp unknown'}</p>
+                        <p className="mt-1 text-xs text-slate-500">{formatMinorAmount(attempt.amountMinor, attempt.currency)} · {attempt.createdAt ? new Date(attempt.createdAt).toLocaleString() : 'timestamp unknown'}</p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="mt-2 text-xs text-slate-500">No payment attempts recorded yet.</p>
+                  <p className="mt-2 text-xs text-slate-500">No payment has been started yet.</p>
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
-        <EmptyState title="No payment obligations" message="Approved commercial obligations will appear here after a proposal or agreement is accepted and a payment source is created." />
+        <EmptyState title="Payment not ready yet" message="Once your proposal is accepted and a payment obligation is created, your Pay Now button will appear here." />
       )}
     </Card>
   );

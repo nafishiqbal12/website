@@ -58,6 +58,18 @@ const SEO_BY_PAGE: Record<StaticPage, SeoConfig> = {
     keywords: TARGET_KEYWORDS,
     ogType: 'service',
   },
+  docs: {
+    title: 'Docs | BlockWaveLab',
+    description: 'BlockWaveLab documentation for platform orientation, services, lifecycle, workspaces, security, and troubleshooting.',
+    path: '/docs',
+    keywords: TARGET_KEYWORDS,
+  },
+  pricing: {
+    title: 'Pricing | BlockWaveLab',
+    description: 'Explore the proposal-based BlockWaveLab engagement model for Web3 infrastructure, automation, operations, and growth systems.',
+    path: '/pricing',
+    keywords: TARGET_KEYWORDS,
+  },
 };
 
 const SEO_BY_DYNAMIC_PAGE: Record<'cases' | 'blog', SeoConfig> = {
