@@ -226,9 +226,11 @@ Explicitly documented capabilities:
 
 The final launch scope and serviceability of GROW remain **UNRESOLVED**.
 
-The service catalog contains a material conflict: it refers to ten initial
-services but explicitly names only five. Only the following names are recorded;
-the missing names are not invented:
+The service catalog contains a material historical conflict: it refers to ten
+initial services but explicitly names only five. The Founder/Business Owner
+approved the five explicitly named services as the official current working
+catalog on **2026-10-09**. The historical ten-versus-five discrepancy remains
+visible and no missing names are invented:
 
 1. Delivery Infrastructure Foundation
 2. CI/CD Hardening and Release Workflow
@@ -236,7 +238,12 @@ the missing names are not invented:
 4. Managed Release Operations
 5. Technical Readiness and Trust Systems
 
-**STATUS: UNRESOLVED.**
+**Current working catalog status: APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09.**
+
+**Historical discrepancy status: HISTORICAL / RETAINED FOR TRACEABILITY.**
+
+Future services must be introduced through documented change management after
+this approval.
 
 ## 10. In-Scope Capabilities
 
@@ -381,7 +388,27 @@ The stakeholder model is documented but not fully assigned:
 | Release owner | Approves release evidence and readiness | OWNER NOT YET ASSIGNED |
 | Client | Supplies context, access, approvals, and acceptance | Client-specific assignment |
 
-No RACI or formal escalation hierarchy is currently baselined.
+Role-level accountability is approved under D-016 by the Founder/Business Owner
+on 2026-10-09. The Founder/Business Owner retains final approval authority
+unless an explicit, scoped delegation is recorded. No individual is appointed
+by this decision, and no role receives unrestricted authority.
+
+### Approved role-level accountability model
+
+| Responsibility area | Accountable | Responsible | Consulted | Informed |
+|---|---|---|---|---|
+| Business/product decisions | PROPOSED — OWNER CONFIRMATION REQUIRED: Founder/Business Owner | PROPOSED — OWNER CONFIRMATION REQUIRED: product/business role | Engineering, delivery, operations, relevant specialists | Affected stakeholders |
+| Commercial/pricing approval | PROPOSED — OWNER CONFIRMATION REQUIRED: Founder/Business Owner or explicitly delegated commercial authority | PROPOSED — OWNER CONFIRMATION REQUIRED: commercial/product role | Accounting, tax, legal, provider specialists where relevant | Engineering, delivery, operations, release |
+| Legal/accounting/provider specialist review | PROPOSED — OWNER CONFIRMATION REQUIRED: Founder/Business Owner for acceptance of specialist input | PROPOSED — OWNER CONFIRMATION REQUIRED: designated specialist coordinator | Relevant legal, privacy, accounting, tax, security, and provider specialists | Product, engineering, delivery, operations, release |
+| Delivery activation | PROPOSED — OWNER CONFIRMATION REQUIRED: Founder/Business Owner or explicitly delegated delivery authority | PROPOSED — OWNER CONFIRMATION REQUIRED: delivery/operations role | Commercial, entitlement, security, technical, and client roles as applicable | Product, engineering, release |
+| Technical/security acceptance | PROPOSED — OWNER CONFIRMATION REQUIRED: Founder/Business Owner or explicitly delegated technical acceptance authority | PROPOSED — OWNER CONFIRMATION REQUIRED: engineering/security role | Delivery, operations, privacy, and provider specialists where relevant | Product, commercial, release |
+| Operations and 30-day observation exit approval | PROPOSED — OWNER CONFIRMATION REQUIRED: Founder/Business Owner or explicitly delegated operations authority | PROPOSED — OWNER CONFIRMATION REQUIRED: operations/delivery role | Engineering, security, client, and product roles as applicable | Commercial, release, support |
+| Final release approval | PROPOSED — OWNER CONFIRMATION REQUIRED: Founder/Business Owner or explicitly delegated release authority | PROPOSED — OWNER CONFIRMATION REQUIRED: release/operations coordinator | Engineering, security, delivery, operations, product, and required specialists | All affected stakeholders |
+
+Named individuals, escalation paths, evidence ownership, and complete RACI
+implementation remain open actions. Technical or operational role existence
+does not confer legal, financial, pricing, settlement, production, or release
+approval authority. No specialist engagement or approval is implied.
 
 ## 17. Roles and Responsibilities
 
@@ -493,7 +520,7 @@ The following are intentionally not defined:
 - Recurring billing execution
 - Final payment-state transitions and provider mapping
 - Acceptance evidence and legal effect
-- Commercial approval delegation limits
+- Founder-controlled pricing and commercial approval authority is approved under D-004; any delegation must be explicit, scoped, documented, evidenced, and auditable. Specific delegation assignments, named individuals, and specialist determinations remain unresolved.
 
 ## 22. Delivery and Operating Model
 
@@ -623,29 +650,30 @@ production observability must not be assumed.
 
 | Decision ID | Decision | Reason Required | Owner | Status | Impact | Target Resolution |
 |---|---|---|---|---|---|---|
-| D-001 | Final service count and names | Catalog and traceability cannot be baselined | OWNER NOT YET ASSIGNED | UNRESOLVED | Product, sales, implementation | Owner review |
+| D-001 | Final service count and names | Current five-service catalog is approved; the historical ten-versus-five discrepancy remains retained | Founder/Business Owner | APPROVED — 2026-10-09 | Product, sales, implementation | Maintain the approved five-service catalog and use documented change control for future additions |
 | D-002 | Geographic and jurisdictional scope | Market, legal, tax, and data obligations depend on it | OWNER NOT YET ASSIGNED | UNRESOLVED | Business and compliance | Owner/legal review |
-| D-003 | Pricing mode and representation | Payment obligations require amount semantics | OWNER NOT YET ASSIGNED | UNRESOLVED | Commercial and technical | Owner/accounting review |
-| D-004 | Pricing ownership and approval authority | Prevents unauthorized commitments and margin leakage | OWNER NOT YET ASSIGNED | UNRESOLVED | Governance | Owner review |
-| D-005 | Currency, tax, accounting, and exchange treatment | Required for financial correctness | OWNER NOT YET ASSIGNED | UNRESOLVED | Commercial and compliance | Accounting review |
+| D-003 | Pricing mode and representation | Payment obligations require amount semantics | Founder/Business Owner approved D-003-A/B/C in principle; material pricing policy remains unresolved | PARTIALLY RESOLVED — D-003-A/B/C APPROVED IN PRINCIPLE; MATERIAL PRICING POLICY UNRESOLVED | Commercial and technical | Owner/accounting review; preserve unresolved prices, units, bundles, margins, public pricing, and dependent policy decisions |
+| D-004 | Pricing ownership and approval authority | Prevents unauthorized commitments and margin leakage | Founder/Business Owner retains final authority; named assignees remain to be nominated | APPROVED — 2026-10-09 | Governance | Record any explicit, scoped delegation and its evidence |
+| D-005 | Currency, tax, accounting, and exchange treatment | Required for financial correctness | OWNER NOT YET ASSIGNED; accounting/tax specialist input required | UNRESOLVED / EXTERNAL INPUT | Commercial and compliance | Accounting/tax review |
 | D-006 | Multi-project allocation and partial purchase behavior | Required for obligations, refunds, and entitlements | OWNER NOT YET ASSIGNED | UNRESOLVED | Commercial and technical | Owner/accounting review |
-| D-007 | Agreement-required cases and acceptance evidence | Determines legal and privacy obligations | OWNER NOT YET ASSIGNED | UNRESOLVED | Legal and product | Legal/privacy review |
-| D-008 | Refund, credit, cancellation, dispute, and chargeback policy | Required for payment lifecycle behavior | OWNER NOT YET ASSIGNED | UNRESOLVED | Commercial and provider | Owner/legal/accounting review |
+| D-007 | Agreement-required cases and acceptance evidence | Determines legal and privacy obligations | OWNER NOT YET ASSIGNED; legal/privacy input required | UNRESOLVED / EXTERNAL INPUT | Legal and product | Legal/privacy review |
+| D-008 | Refund, credit, cancellation, dispute, and chargeback policy | Required for payment lifecycle behavior | OWNER NOT YET ASSIGNED; legal, accounting, and payment-provider input required | UNRESOLVED / EXTERNAL INPUT | Commercial and provider | Owner/legal/accounting/provider review |
 | D-009 | Recurring billing execution and cancellation | Required before subscription behavior | OWNER NOT YET ASSIGNED | DEFERRED / UNRESOLVED | Commercial and technical | Owner/provider review |
 | D-010 | Entitlement duration, suspension, expiry, and revocation | Required for service access lifecycle | OWNER NOT YET ASSIGNED | UNRESOLVED | Product and technical | Owner review |
-| D-011 | Delivery activation prerequisites and authority | Prevents premature delivery | OWNER NOT YET ASSIGNED | UNRESOLVED | Delivery and security | Owner/operations review |
-| D-012 | GROW launch scope | Current serviceability is less specific | OWNER NOT YET ASSIGNED | UNRESOLVED | Product and delivery | Owner review |
-| D-013 | OPERATE coverage and monitoring boundaries | Required for operational commitments | OWNER NOT YET ASSIGNED | UNRESOLVED | Operations | Operations owner review |
-| D-014 | AUTOMATE model/provider and usage limits | Required for cost, privacy, and control | OWNER NOT YET ASSIGNED | UNRESOLVED | Technical and commercial | Owner/security review |
-| D-015 | Catalog administration and activation authority | Required for governance and auditability | OWNER NOT YET ASSIGNED | UNRESOLVED | Operations and security | Owner review |
-| D-016 | Named accountability and escalation model | Required for governance and release approval | OWNER NOT YET ASSIGNED | MISSING INFORMATION | Organization-wide | Governance review |
+| D-011 | Delivery activation prerequisites and authority | Prevents premature delivery and requires runtime transition evidence | OWNER NOT YET ASSIGNED; runtime evidence required | UNRESOLVED / RUNTIME REQUIRED | Delivery and security | Owner/operations review and approved runtime tests |
+| D-012 | Payment settlement behavior | Provider settlement and replay behavior are not verified | OWNER NOT YET ASSIGNED; provider/accounting input and runtime evidence required | DEFERRED / RUNTIME NOT VERIFIED | Payment and release | Owner/provider review and approved provider tests |
+| D-013 | GROW launch scope | Current serviceability is less specific | OWNER NOT YET ASSIGNED | UNRESOLVED | Product and delivery | Owner review |
+| D-014 | OPERATE coverage and monitoring boundaries | Required for operational commitments | OWNER NOT YET ASSIGNED | UNRESOLVED | Operations | Operations owner review |
+| D-015 | AUTOMATE model/provider and usage limits | Required for cost, privacy, and control | OWNER NOT YET ASSIGNED; security/privacy/provider input required | UNRESOLVED / EXTERNAL INPUT | Technical and commercial | Owner/security/provider review |
+| D-016 | Named accountability and escalation model | Required for governance and release approval | Founder/Business Owner approved role-level accountability under Option A on 2026-10-09; named individuals to be nominated later | APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09 | Organization-wide | Governance review; named ownership, escalation, evidence ownership, and scoped delegation remain open |
 | D-017 | Current phase and implementation-gate reconciliation | Required for accurate status reporting | OWNER NOT YET ASSIGNED | UNRESOLVED | SDLC and release | Release review |
+| D-018 | Standard post-deployment observation duration | Founder/Business Owner selected 30 calendar days after deployment on 2026-10-09; historical 60-day references in BLOCKWAVELAB_V2_SPEC.md are retained as superseded source history | Founder/Business Owner | APPROVED — 2026-10-09 | Delivery and commercial governance | Apply current policy while preserving observation evidence and authorized exit approval |
 
 ## 30. Documentation Conflicts
 
 | Conflict ID | Document A | Document B | Conflicting Statement | Impact | Current Status | Resolution Required | Decision Owner |
 |---|---|---|---|---|---|---|---|
-| C-001 | [PHASE_15_2 service catalog](../BLOCKWAVELAB_V2_PHASE_15_2_SERVICE_CATALOG.md) | Same document | States ten initial services but explicitly names five | Catalog and traceability ambiguity | UNRESOLVED | Confirm final count and names without inventing services | OWNER NOT YET ASSIGNED |
+| C-001 | [PHASE_15_2 service catalog](../BLOCKWAVELAB_V2_PHASE_15_2_SERVICE_CATALOG.md) | Same document | Historical source states ten initial services but explicitly names five; the Founder/Business Owner approved the five named services as the current working catalog on 2026-10-09 | Historical discrepancy retained; current catalog resolved | RESOLVED FOR CURRENT CATALOG / HISTORICAL DISCREPANCY RETAINED | Retain the historical source unchanged and require documented change control for future additions | Founder/Business Owner |
 | C-002 | [PHASE_15_6 payment foundation](../PHASE_15_6_PAYMENT_FOUNDATION_IMPLEMENTATION.md) | [SRS](../BLOCKWAVELAB_SRS.md) | Delivery activation is described as implemented in one scope and excluded/not implemented in another | Current capability boundary is unclear | UNRESOLVED | Reconcile exact implementation scope and evidence | OWNER NOT YET ASSIGNED |
 | C-003 | [PHASE_15_6 payment foundation](../PHASE_15_6_PAYMENT_FOUNDATION_IMPLEMENTATION.md) | [Release readiness checklist](../RELEASE_READINESS_CHECKLIST.md) | Settlement/provider deployment claims differ from deferred/not-verified claims | Provider readiness may be overstated | UNRESOLVED | Separate schema, deployment, configuration, and runtime evidence | Release owner not assigned |
 | C-004 | [PHASE_15.5D closure](../BLOCKWAVELAB_V2_PHASE_15_5D_OWNER_DECISION_CLOSURE.md) | [PHASE_15_6 payment foundation](../PHASE_15_6_PAYMENT_FOUNDATION_IMPLEMENTATION.md) | Phase 15.6 gate is NO versus later Phase 15.6 implementation | Current phase and authorization chronology are unclear | UNRESOLVED | Record supersession or approved gate change | Release owner not assigned |
@@ -771,4 +799,3 @@ evidence, and unresolved governance decisions.
 ## CHARTER STATUS
 
 **DRAFT — PENDING OWNER REVIEW**
-

@@ -83,6 +83,8 @@
 - Monitoring period for reliability, behavior, and operational quality
 - Captures issues, bottlenecks, and optimization opportunities
 
+> **Current-policy cross-reference:** This historical 60-day reference is retained for traceability. The current approved observation-duration policy is 30 calendar days after deployment under D-018, approved 2026-10-09. See the current governance decision records. This policy does not establish acceptance criteria, SLA/SLO commitments, legal terms, runtime implementation, or automatic handover.
+
 ## 12. Stabilization and Optimization
 - Follow-up execution based on observation findings
 - Prioritized fixes and optimization actions
@@ -124,6 +126,8 @@
 8. Handover
 9. Optional monthly or annual managed service
 
+> **Current-policy cross-reference:** The historical 60-day lifecycle reference is retained for traceability. The current approved observation-duration policy is 30 calendar days after deployment under D-018, approved 2026-10-09. See the current governance decision records.
+
 ## 19. Project Lifecycle
 1. Discovery and scope framing
 2. Technical design and implementation planning
@@ -160,6 +164,8 @@
 - View active monthly or annual managed services
 - View add-on and multi-service portfolio status
 - View support requests and status timeline
+
+> **Current-policy cross-reference:** The historical 60-day dashboard reference is retained for traceability. The current approved observation-duration policy is 30 calendar days after deployment under D-018, approved 2026-10-09. See the current governance decision records. Duration alone does not authorize handover or stage progression.
 
 ## 23. AI Agent Architecture
 - Agent-enabled automation layer scoped to approved operational tasks

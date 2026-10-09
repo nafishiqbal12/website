@@ -6,6 +6,31 @@
 
 This phase does not implement payment settlement, a payment provider, checkout, webhooks, reconciliation, refunds, credits, disputes, tax calculation, subscriptions, recurring billing execution, delivery activation, observation automation, e-signature, or new commercial roles.
 
+## Current Status Boundary — 2026-10-09
+
+This document is a historical Phase 15.6 implementation report. The status and
+phase-section claims below preserve the reporting context in which they were
+recorded and must not be read as current production-readiness approval.
+
+For current release status, [RELEASE_READINESS_CHECKLIST.md](./RELEASE_READINESS_CHECKLIST.md)
+is authoritative. It records authenticated runtime and authorization as
+blocked, lifecycle runtime and Stripe verification as not verified,
+operational readiness as not verified, and production launch approval as
+**OWNER DECISION / BLOCKED BY REQUIRED GATES**.
+
+The current decision and conflict records also preserve the unresolved
+chronology and evidence boundaries:
+
+- [BLOCKWAVELAB_V2_CHARTER_DECISION_REGISTER.md](./01-charter/BLOCKWAVELAB_V2_CHARTER_DECISION_REGISTER.md)
+  records the Phase 15.5D/15.6 chronology and remote/provider conflicts.
+- [BLOCKWAVELAB_V2_OWNER_DECISION_RESOLUTION_PLAN.md](./01-charter/BLOCKWAVELAB_V2_OWNER_DECISION_RESOLUTION_PLAN.md)
+  records evidence and approval requirements for current governance decisions.
+
+Remote settlement, provider execution, replay behavior, entitlement,
+delivery-activation, and downstream lifecycle claims remain historical,
+structural, deferred, or runtime-unverified according to the dated evidence;
+this note does not supersede or rewrite the original report sections.
+
 ## Phase 15.18D - Deployment and Remote Security Verification
 
 ### Implemented

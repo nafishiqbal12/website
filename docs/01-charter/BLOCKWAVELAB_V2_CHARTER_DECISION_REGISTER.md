@@ -107,7 +107,7 @@ Audit conclusion: **PARTIALLY COMPLETE — OWNER DECISIONS / EVIDENCE RECONCILIA
 
 | ID | Conflict | Documents Involved | What Each Document Says | Conflict Type | Can Documentation Evidence Resolve It? | Owner Decision Required? | Runtime Evidence Required? | Recommended Resolution Path | Current Status |
 |---|---|---|---|---|---|---|---|---|---|
-| C-001 | Ten services versus five explicitly named services | [PHASE_15_2 service catalog](../BLOCKWAVELAB_V2_PHASE_15_2_SERVICE_CATALOG.md) | The document references ten grouped services but explicitly names five. | Product/catalog | Partially; the document establishes the inconsistency, not the missing names. | Yes | No | Owner confirms final count and names; do not invent the remaining five. | UNRESOLVED |
+| C-001 | Ten services versus five explicitly named services | [PHASE_15_2 service catalog](../BLOCKWAVELAB_V2_PHASE_15_2_SERVICE_CATALOG.md) | The historical source references ten grouped services but explicitly names five; the Founder/Business Owner approved the five named services as the current working catalog on 2026-10-09. | Historical discrepancy retained; current catalog resolved | Partially; the source discrepancy remains historical and the approval resolves only the current working catalog. | No for the current five-service catalog; yes for any future additions | No for the current catalog; runtime catalog behavior is separate | Retain the historical source unchanged, record the approved five-service catalog, and require documented change control for future additions. | RESOLVED FOR CURRENT CATALOG / HISTORICAL DISCREPANCY RETAINED |
 | C-002 | Phase 15.6 delivery activation ambiguity | [PHASE_15_6 implementation](../PHASE_15_6_PAYMENT_FOUNDATION_IMPLEMENTATION.md); [SRS](../BLOCKWAVELAB_SRS.md) | Phase 15.6 describes delivery foundations and also excludes or separates delivery activation in different sections; the SRS marks related behavior partial/deferred. | Scope/status | Partially; documents can classify scope but cannot prove behavior. | Possibly, for approved scope boundary | Yes | Reconcile exact objects, transitions, deployment state, and runtime evidence. | UNRESOLVED / NOT VERIFIED |
 | C-003 | Phase 15.6 settlement/provider ambiguity | [PHASE_15_6 implementation](../PHASE_15_6_PAYMENT_FOUNDATION_IMPLEMENTATION.md); [Release checklist](../RELEASE_READINESS_CHECKLIST.md) | Settlement migrations and webhook deployment are described, while live provider execution, secrets, and replay behavior remain deferred or not verified. | Implementation/evidence | Yes for artifact classification; no for provider behavior. | No new business decision for testing, but provider authorization is required | Yes | Separate local schema, remote deployment, configuration, live execution, and replay evidence. | DEFERRED / NOT VERIFIED |
 | C-004 | Phase 15.5D gate versus Phase 15.6 implementation | [15.5D closure](../BLOCKWAVELAB_V2_PHASE_15_5D_OWNER_DECISION_CLOSURE.md); [PHASE_15_6 implementation](../PHASE_15_6_PAYMENT_FOUNDATION_IMPLEMENTATION.md) | 15.5D records the Phase 15.6 gate as `NO`; later documentation reports Phase 15.6 work. | Governance/chronology | Yes only if a supersession or gate-change record exists; none was found in the reviewed set. | Yes, to approve or record the gate transition | Not for chronology; yes for resulting implementation claims | Record chronology, supersession, or explicit authorization without rewriting history. | UNRESOLVED |
@@ -118,9 +118,12 @@ Audit conclusion: **PARTIALLY COMPLETE — OWNER DECISIONS / EVIDENCE RECONCILIA
 
 ## 6. SERVICE CATALOG DECISION
 
-The repository currently supports the following conclusion:
+The repository and founder direction support the following approved current
+working position:
 
-> **10 grouped services are referenced, but only 5 are explicitly named; the remaining five are unresolved.**
+> **The current working catalog contains the five explicitly named services;
+> the historical source discrepancy references ten grouped services but does
+> not provide five additional names.**
 
 The five explicitly named services are:
 
@@ -134,11 +137,33 @@ The service catalog also documents four approved capability pillars and
 capability-level service concepts. Those capability lists must not be treated
 as authorization to invent five additional sellable service names.
 
-**Decision status: UNRESOLVED.**
+**Working decision status: APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09.**
 
-Resolution requires a business-owner decision confirming either the complete
-ten-service catalog or a corrected documented count. Until then, the Charter
-must preserve the five explicit names and the unresolved remainder.
+**Approval authority:** Founder/Business Owner
+
+**Approval date:** 2026-10-09
+**Approval scope:** The five explicitly named services are the official current
+working catalog. This approval does not invent or approve the five unnamed
+historical service groupings, and future additions require documented change
+control.
+
+The historical discrepancy remains retained for traceability. Future services
+must be introduced through documented change management after formal approval.
+The Charter and service catalog remain separate draft documents until their
+own review gates are complete; this decision approval does not baseline either
+document or approve production readiness.
+
+### Observation-period evidence note
+
+The V2 specification explicitly documents a **60-day observation** period
+beginning after production deployment and treats observation as part of the
+paid implementation lifecycle. Later commercial decision records leave the
+observation duration unresolved and state that a duration must not be
+invented. This historical 60-day statement is superseded for the current working policy
+by D-018: **30 calendar days after deployment**, approved by the
+Founder/Business Owner on **2026-10-09**. The 30-day policy is not runtime
+evidence, does not define acceptance metrics or an SLA/SLO, and does not by
+itself authorize handover or stage progression.
 
 ## 7. PHASE 15.5D / 15.6 RECONCILIATION
 
@@ -342,14 +367,14 @@ The following decisions remain open or externally dependent:
 | Area | Current documented position | Required determination | Status |
 |---|---|---|---|
 | Pricing | Scope/proposal-based direction; no prices | Fixed, calculated, negotiated, or hybrid mechanics; amount semantics | UNRESOLVED |
-| Pricing authority | Not assigned | Approver, delegation, and audit limits | UNRESOLVED |
+| Pricing authority | Founder/Business Owner retains final pricing and commercial approval authority under D-004 Option A; named delegation assignments remain open | Approver, delegation, and audit limits | APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09; specific delegations remain open |
 | Currency | USD primary direction | Storage, minor units, exchange, and non-USD treatment | UNRESOLVED / ACCOUNTING INPUT |
 | Tax | Not defined | Tax basis, calculation, display, and reporting | UNRESOLVED / ACCOUNTING INPUT |
 | Accounting | Not defined | Reconciliation, reporting, and treatment of commercial events | UNRESOLVED / ACCOUNTING INPUT |
 | Refunds and credits | Not defined | Eligibility, authority, allocation, and state effects | UNRESOLVED |
 | Cancellation and pause | Explicit transition direction only | Timing, access, operational, and financial effects | UNRESOLVED |
 | Disputes and chargebacks | Not defined | Provider, entitlement, delivery, and accounting effects | UNRESOLVED / PROVIDER INPUT |
-| Recurring billing | Monthly primary direction; annual optional/future | Execution, renewal, failure, cancellation, and provider behavior | DEFERRED / UNRESOLVED |
+| Recurring billing | Monthly primary direction; annual optional/future; execution is not approved | Execution, renewal, failure, cancellation, and provider behavior | DEFERRED / UNRESOLVED |
 | Entitlement duration | Server-controlled and scoped in architecture | Duration, suspension, expiry, and revocation policy | UNRESOLVED |
 | Service activation | Separate explicit gate after commercial checks | Authority, prerequisites, and evidence | UNRESOLVED / RUNTIME REQUIRED |
 | Acceptance | Authenticated in-platform direction | Legal effect, evidence, identity assurance, retention, and privacy | UNRESOLVED / LEGAL INPUT |
@@ -438,23 +463,24 @@ Phase 15.6 or fully through Phase 15.6.
 
 | Decision ID | Decision | Category | Current documented position | Options explicitly supported by existing documentation | Decision owner required | Evidence required | Impact | Status |
 |---|---|---|---|---|---|---|---|---|
-| D-001 | Final service count and names | Product | Ten grouped services referenced; five named | Confirm ten with five additional approved names, or correct the documented count | Yes | Approved catalog record | Product, sales, requirements, traceability | UNRESOLVED |
+| D-001 | Final service count and names | Product | Founder/Business Owner approved the five explicitly named services as the official current working catalog on 2026-10-09; the historical source discrepancy references ten grouped services; no additional names are supplied. | Approved current working catalog with change-controlled additions | No further decision is required for the current five-service catalog. | Approval record and versioned catalog/change record | Product, sales, requirements, traceability | APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09 |
 | D-002 | Geographic and jurisdictional scope | Business/compliance | Not established | None documented | Yes | Owner and legal record | Market, contracts, tax, privacy, operations | UNRESOLVED |
-| D-003 | Pricing mechanics | Commercial | Scope/proposal-based; no prices | Fixed, calculated, negotiated, hybrid, or manual snapshot are documented as candidate options | Yes | Approved commercial policy | Payment, proposal, accounting, tests | UNRESOLVED |
-| D-004 | Pricing authority | Governance | Not assigned | Owner-controlled or approved delegated policy paths are documented as candidates | Yes | Approval policy and audit rules | Commercial governance | UNRESOLVED |
-| D-005 | Currency/accounting treatment | Commercial/accounting | USD primary direction | One approved currency, bounded currency set, or per-proposal currency are documented as policy options; accounting input remains required | Yes/external | Accounting determination | Payment, tax, reporting | UNRESOLVED |
+| D-003 | Pricing mechanics | Commercial | Founder/Business Owner approved D-003-A fixed-scope implementation, custom quotation for materially variable/non-standard scope, and separately priced monthly Managed Operations in principle on 2026-10-09. D-003-B permits documented, case-specific introductory discounts. D-003-C defers public prices while permitting approved service descriptions and inquiry/custom-quotation messaging. | No specific prices, price ranges, bundles, margins, payment execution, recurring-billing implementation, or public pricing are approved. | Yes | Approved commercial policy and proposal snapshot rules | Payment, proposal, accounting, tests | PARTIALLY RESOLVED — D-003-A/B/C APPROVED IN PRINCIPLE; MATERIAL PRICING POLICY UNRESOLVED |
+| D-004 | Pricing authority | Governance | Founder/Business Owner approved Option A on 2026-10-09: Founder-controlled pricing and commercial approval authority is the default unless explicit, scoped, documented delegation is recorded. Preparation, scoping, estimating, and review do not constitute approval; discounts and exceptions require documented approval, reasons, evidence, and applicable change control. | Owner-controlled default with explicit, scoped, documented delegation | Yes | Approval policy, delegation records where applicable, and audit evidence | Commercial governance | APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09 |
+| D-005 | Currency/accounting treatment | Commercial/accounting | USD primary direction; accounting/tax input remains required | One approved currency, bounded currency set, or per-proposal currency are documented as policy options; accounting input remains required | Yes/external | Accounting determination | Payment, tax, reporting | UNRESOLVED / EXTERNAL INPUT |
 | D-006 | Multi-project and partial allocation | Commercial | Explicit scope required; allocation undefined | Defer multi-project settlement allocation or approve item/project allocation | Yes | Policy plus runtime tests | Obligations, refunds, entitlements | UNRESOLVED |
-| D-007 | Agreement and acceptance policy | Legal/product | Authenticated acceptance direction; legal effect not claimed | Agreement-required boundary and minimum acceptance evidence must be selected from documented candidates | Yes/external | Legal/privacy approval and runtime acceptance test | Commercial, privacy, audit | UNRESOLVED |
-| D-008 | Refund/credit/cancellation/dispute behavior | Commercial/provider | Not defined | No final option selected in source documents | Yes/external | Approved policy and provider behavior | Payment, entitlement, delivery | UNRESOLVED |
-| D-009 | Recurring billing execution | Commercial/provider | Monthly primary; annual optional/future | Defer execution or approve a provider-backed recurring model | Yes | Provider configuration and runtime tests | Subscriptions, access, accounting | DEFERRED |
+| D-007 | Agreement and acceptance policy | Legal/product | Authenticated acceptance direction; legal effect not claimed; legal/privacy input remains required | Agreement-required boundary and minimum acceptance evidence must be selected from documented candidates | Yes/external | Legal/privacy approval and runtime acceptance test | Commercial, privacy, audit | UNRESOLVED / EXTERNAL INPUT |
+| D-008 | Refund/credit/cancellation/dispute behavior | Commercial/provider | Not defined; legal, accounting, and payment-provider input remains required | No final option selected in source documents | Yes/external | Approved policy and provider behavior | Payment, entitlement, delivery | UNRESOLVED / EXTERNAL INPUT |
+| D-009 | Recurring billing execution | Commercial/provider | Monthly primary; annual optional/future; execution is not approved | Defer execution or approve a provider-backed recurring model | Yes | Provider configuration and runtime tests | Subscriptions, access, accounting | DEFERRED / UNRESOLVED |
 | D-010 | Entitlement lifecycle | Product/technical | Server-controlled and scoped direction | Duration, suspension, expiry, and revocation require policy selection | Yes | Policy plus authenticated lifecycle tests | Access and delivery | UNRESOLVED |
-| D-011 | Delivery activation gate | Delivery/security | Separate explicit gate | Define prerequisites and authority without coupling it to payment automatically | Yes | Runtime transition evidence | Delivery start and audit | UNRESOLVED |
-| D-012 | Payment settlement behavior | Provider/technical | Provider-verified boundary; live test absent | Provider-neutral foundation before provider-specific behavior, or approved provider execution | Yes/external | Live provider event, replay, reconciliation | Payment and release | DEFERRED |
+| D-011 | Delivery activation gate | Delivery/security | Separate explicit gate; runtime transition evidence remains required | Define prerequisites and authority without coupling it to payment automatically | Yes | Runtime transition evidence | Delivery start and audit | UNRESOLVED / RUNTIME REQUIRED |
+| D-012 | Payment settlement behavior | Provider/technical | Provider-verified boundary; live test absent; settlement remains runtime not verified | Provider-neutral foundation before provider-specific behavior, or approved provider execution | Yes/external | Live provider event, replay, reconciliation | Payment and release | DEFERRED / RUNTIME NOT VERIFIED |
 | D-013 | GROW launch scope | Product/delivery | Capability family documented; launch detail unclear | Client-selectable or reviewed capability-family boundary are documented directions | Yes | Approved catalog and acceptance criteria | Product and delivery | UNRESOLVED |
 | D-014 | OPERATE boundaries | Operations | Capability family documented; coverage unclear | Explicitly scoped operations with monitoring/support boundary, or defer offering | Yes | Operating model and acceptance evidence | Support, SLO/SLA, risk | UNRESOLVED |
-| D-015 | AUTOMATE provider and limits | Technical/commercial | Provider not selected; human governance required | Scope provider per engagement or defer provider-backed automation | Yes | Security/privacy/provider review | Cost, privacy, AI controls | UNRESOLVED |
-| D-016 | Accountability and RACI | Governance | Roles identified; names absent | RACI or equivalent accountability model | Yes | Owner-approved governance record | All downstream gates | MISSING INFORMATION |
+| D-015 | AUTOMATE provider and limits | Technical/commercial | Provider not selected; human governance required; security/privacy/provider input remains required | Scope provider per engagement or defer provider-backed automation | Yes | Security/privacy/provider review | Cost, privacy, AI controls | UNRESOLVED / EXTERNAL INPUT |
+| D-016 | Accountability and RACI | Governance | Founder/Business Owner approved Option A on 2026-10-09: role-level accountability now, with named individuals nominated later; Founder retains final approval authority unless explicitly delegated | Role-level RACI/equivalent model; named owners, escalation paths, evidence ownership, and scoped delegation remain open | Yes | Owner-approved governance record and later named-owner records | All downstream gates | APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09 |
 | D-017 | Current phase and gate | SDLC governance | Phase 15.5D gate conflicts with Phase 15.6 reports | Record chronology and explicit supersession/gate transition | Yes | Versioned governance decision and evidence index | Charter status and roadmap | UNRESOLVED |
+| D-018 | Standard post-deployment observation duration | Commercial/delivery governance | BLOCKWAVELAB_V2_SPEC.md preserves historical 60-day observation statements; the current working policy requires an owner-selected duration without inventing commercial commitments. | Founder/Business Owner selected 30 calendar days after deployment on 2026-10-09. | No for the policy decision; runtime observation execution remains unverified. | Not currently required. | Dated owner decision and controlled documentation update. | Observation policy gate; separate from acceptance, KPI, SLA/SLO, and release gates. | Owner Decision Register, Charter, Business Baseline, Delivery Playbook, change log. | BLOCKWAVELAB_V2_SPEC.md §§11, 18, and 22 remain historical source content; current policy references and delivery governance documents supersede them for current policy. | Delivery planning and observation exit evidence. | APPROVED — FOUNDER/BUSINESS OWNER, 2026-10-09 |
 
 No options outside existing documentation are introduced by this register.
 
