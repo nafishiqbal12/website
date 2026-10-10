@@ -8,10 +8,12 @@ import OperatePage from '../pages/OperatePage';
 import GrowPage from '../pages/GrowPage';
 import DocsPage from '../pages/DocsPage';
 import PricingPage from '../pages/PricingPage';
+import InquiryPage from '../pages/InquiryPage';
 import { ForgotPasswordPage, LoginPage, ResetPasswordPage, SignupPage } from '../pages/AuthPages';
 import PaymentResult from '../pages/PaymentResult';
 import PlatformApp from '../pages/platform/PlatformApp';
 import { getPostBySlug, type Post } from '../lib/blog';
+import BlogPostNotFound from '../pages/BlogPostNotFound';
 import { getSeoForRoute } from './seoConfig';
 import {
   SITE_URL,
@@ -312,6 +314,8 @@ export default function AppRouter() {
         return <DocsPage path={route.path} onNavigate={navigate} />;
       case 'pricing':
         return <PricingPage onNavigate={navigate} />;
+      case 'contact':
+        return <InquiryPage onNavigate={navigate} />;
       case 'login':
         return <LoginPage onNavigate={navigate} />;
       case 'signup':
@@ -352,7 +356,7 @@ export default function AppRouter() {
         if (currentBlogPost) {
           return <BlogPostPage post={currentBlogPost} onNavigate={navigate} />;
         }
-        return <Blog onNavigate={navigate} />;
+        return <BlogPostNotFound slug={route.slug} onNavigate={navigate} />;
       case 'blog-tag':
         return route.slug ? <BlogTag tag={route.slug} onNavigate={navigate} /> : <Blog onNavigate={navigate} />;
       default:

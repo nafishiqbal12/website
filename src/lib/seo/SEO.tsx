@@ -65,8 +65,6 @@ export default function SEO({
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
 
-      <link rel="canonical" href={url} />
-
       <meta property="og:locale" content="en_US" />
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:type" content={type === 'article' ? 'article' : 'website'} />

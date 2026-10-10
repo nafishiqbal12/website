@@ -70,6 +70,12 @@ const SEO_BY_PAGE: Record<StaticPage, SeoConfig> = {
     path: '/pricing',
     keywords: TARGET_KEYWORDS,
   },
+  contact: {
+    title: 'Discuss Your Project | BlockWaveLab',
+    description: 'Share your Web3 project context with BlockWaveLab to begin qualification and scope discussion.',
+    path: '/contact',
+    keywords: TARGET_KEYWORDS,
+  },
 };
 
 const SEO_BY_DYNAMIC_PAGE: Record<'cases' | 'blog', SeoConfig> = {
@@ -141,6 +147,21 @@ export function getSeoForRoute(route: RouteState, currentBlogPost?: Post, curren
       type: 'article',
       title: currentBlogPost.title,
       tags: currentBlogPost.tags,
+    });
+  }
+
+  if (route.page === 'blog-post') {
+    const seo = {
+      title: 'Article not found | BlockWaveLab',
+      description: 'The requested BlockWaveLab editorial article could not be found.',
+      path: '/blog',
+      keywords: TARGET_KEYWORDS,
+      noIndex: true,
+    };
+
+    return buildSeoResolution(seo, {
+      canonical: `${SITE_URL}/blog`,
+      title: seo.title,
     });
   }
 

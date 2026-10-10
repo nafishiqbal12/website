@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
-import type { MouseEvent } from 'react';
+import { Badge, Card, Container, Link } from '../components/ui';
+import { PageShell } from '../components/shells';
 import SEO from '../lib/seo/SEO';
 import { getAllPosts, type Post } from '../lib/blog';
 
@@ -9,149 +10,61 @@ interface BlogPostPageProps {
 }
 
 export default function BlogPostPage({ post, onNavigate }: BlogPostPageProps) {
-  const relatedPosts = getAllPosts().filter((item) => item.slug !== post.slug).slice(0, 2);
-
-  const breadcrumbSchema = {
+  const relatedPosts = getAllPosts().filter((item) => item.slug !== post.slug).slice(0, 3);
+  const articleSchema = {
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: 'https://blockwavelab.com/',
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Blog',
-        item: 'https://blockwavelab.com/blog',
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: post.title,
-        item: `https://blockwavelab.com/blog/${post.slug}`,
-      },
-    ],
-  };
-
-  const handleNav = (event: MouseEvent<HTMLAnchorElement>, target: string) => {
-    event.preventDefault();
-    onNavigate(target);
+    '@type': 'Article',
+    headline: post.title,
+    description: post.description,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt ?? post.publishedAt,
+    author: { '@type': 'Organization', name: post.author ?? 'BlockWaveLab Team' },
+    publisher: { '@type': 'Organization', name: 'BlockWaveLab', url: 'https://blockwavelab.com' },
+    mainEntityOfPage: `https://blockwavelab.com/blog/${post.slug}`,
+    keywords: post.tags.join(', '),
   };
 
   return (
-    <div className="pt-16">
-      <SEO
-        title={post.title}
-        description={post.description}
-        canonical={`https://blockwavelab.com/blog/${post.slug}`}
-        type="article"
-        publishedTime={post.publishedAt}
-        modifiedTime={post.publishedAt}
-        author={post.author}
-        tags={post.tags}
-        jsonLd={breadcrumbSchema}
-      />
-      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white py-16" aria-label="Blog article header">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-blue-100/90">
-            <a href="/" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, 'home')} className="hover:text-white transition-colors">
-              Home
-            </a>
-            <span className="mx-2">/</span>
-            <a href="/blog" onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/blog')} className="hover:text-white transition-colors">
-              Blog
-            </a>
-          </nav>
-          <a
-            href="/blog"
-            onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/blog')}
-            className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-7"
-            aria-label="Back to blog"
-          >
-            <ArrowLeft size={16} />
-            <span>Back to Blog</span>
-          </a>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-4 leading-tight">{post.title}</h1>
-          <p className="text-lg text-blue-100 mb-6">{post.description}</p>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-blue-100">
-            <time className="inline-flex items-center gap-1" dateTime={post.publishedAt}>
-              <Calendar size={14} />
-              {post.publishedAt}
-            </time>
-              <span className="inline-flex items-center gap-1">
-                <Clock size={14} />
-                {post.readingTime ?? ''}
-              </span>
-            <span>By {post.author}</span>
+    <PageShell>
+      <SEO title={post.title} description={post.description} canonical={`https://blockwavelab.com/blog/${post.slug}`} type="article" publishedTime={post.publishedAt} modifiedTime={post.updatedAt} author={post.author} tags={post.tags} jsonLd={articleSchema} />
+      <Container narrow>
+        <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-sm text-slate-500">
+          <Link href="/" onNavigate={onNavigate} targetPath="/">Home</Link><span aria-hidden="true">/</span><Link href="/blog" onNavigate={onNavigate} targetPath="/blog">Blog</Link><span aria-hidden="true">/</span><span aria-current="page" className="truncate text-slate-300">{post.title}</span>
+        </nav>
+        <Link href="/blog" onNavigate={onNavigate} targetPath="/blog" className="inline-flex items-center gap-2 text-sm"><ArrowLeft size={16} />Back to blog</Link>
+        <header className="mt-8 border-b border-slate-800 pb-10">
+          <Badge tone="info">Editorial draft</Badge>
+          <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-slate-50 sm:text-5xl">{post.title}</h1>
+          <p className="mt-5 text-lg leading-8 text-slate-300">{post.description}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-slate-500">
+            <time dateTime={post.publishedAt} className="inline-flex items-center gap-1"><Calendar size={15} />{post.publishedAt}</time>
+            <span className="inline-flex items-center gap-1"><Clock size={15} />{post.readingTime ?? 'Editorial note'}</span>
+            <span>By {post.author ?? 'BlockWaveLab Team'}</span>
           </div>
+        </header>
+        <article className="prose prose-invert prose-lg max-w-none py-12" aria-label="Article content">
+          <post.Component />
+        </article>
+        <div className="flex flex-wrap gap-2 border-t border-slate-800 pt-6">
+          {post.tags.map((tag) => <span key={tag} className="rounded-full border border-cyan-300/20 bg-cyan-300/[0.06] px-2.5 py-1 text-xs text-cyan-200">{tag}</span>)}
         </div>
-      </section>
-
-      <article className="py-16 bg-white" aria-label="Blog article content">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* JSON-LD injected via SEO component */}
-
-          <div className="max-w-none prose prose-lg dark:prose-invert">
-            <post.Component />
+        <Card className="mt-12 border-cyan-300/20 bg-cyan-300/[0.05]">
+          <h2 className="text-2xl font-semibold text-slate-50">Apply the thinking to your project</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-400">Review the documented services or share context through the existing inquiry route. This article does not establish a delivery guarantee or production capability.</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/docs/services" onNavigate={onNavigate} targetPath="/docs/services" className="inline-flex items-center justify-center rounded-xl border border-slate-600 px-5 py-3 text-slate-100 hover:bg-slate-800/60">Explore services</Link>
+            <Link href="/contact" onNavigate={onNavigate} targetPath="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 px-5 py-3 font-medium text-slate-950 hover:from-cyan-300 hover:to-blue-400">Discuss your project <ArrowRight size={16} /></Link>
           </div>
-
-          <div className="mt-10 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-12 p-7 rounded-2xl bg-gray-50 border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Apply this to your project</h2>
-            <p className="text-gray-600 mb-5">
-              If you want to apply these ideas to your project, our team can help map the right implementation, automation, operations, or growth path.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <a
-                href="/build"
-                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/build')}
-                className="px-6 py-3 rounded-lg bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-colors"
-              >
-                Explore BUILD
-              </a>
-              <a
-                href="/operate"
-                onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, '/operate')}
-                className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
-              >
-                Discuss your project
-              </a>
+        </Card>
+        {relatedPosts.length > 0 ? (
+          <section className="mt-16 border-t border-slate-800 pt-10" aria-labelledby="related-articles-title">
+            <h2 id="related-articles-title" className="text-2xl font-bold text-slate-50">More editorial notes</h2>
+            <div className="mt-6 grid gap-5 md:grid-cols-3">
+              {relatedPosts.map((related) => <Card key={related.slug} className="p-5"><h3 className="font-semibold text-slate-100">{related.title}</h3><p className="mt-2 text-sm leading-6 text-slate-400">{related.description}</p><Link href={`/blog/${related.slug}`} onNavigate={onNavigate} targetPath={`/blog/${related.slug}`} className="mt-4 inline-flex items-center gap-2 text-sm">Read article <ArrowRight size={15} /></Link></Card>)}
             </div>
-          </div>
-        </div>
-      </article>
-
-      <section className="py-16 bg-gray-50" aria-label="Related articles">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {relatedPosts.map((related) => (
-              <article key={related.slug} className="bg-white rounded-xl border border-gray-100 p-5">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{related.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{related.description}</p>
-                <a
-                  href={`/blog/${related.slug}`}
-                  onClick={(event: MouseEvent<HTMLAnchorElement>) => handleNav(event, `/blog/${related.slug}`)}
-                  className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-cyan-500 transition-colors"
-                >
-                  <span>Read more</span>
-                  <ArrowRight size={15} />
-                </a>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
+          </section>
+        ) : null}
+      </Container>
+    </PageShell>
   );
 }

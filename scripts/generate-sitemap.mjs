@@ -4,7 +4,20 @@ import path from 'node:path';
 const siteUrl = 'https://blockwavelab.com';
 const workspaceRoot = process.cwd();
 
-const requiredPaths = ['/', '/build', '/automate', '/operate', '/grow'];
+const requiredPaths = [
+  '/',
+  '/build',
+  '/automate',
+  '/operate',
+  '/grow',
+  '/blog',
+  '/blog/web3-deployment-readiness-for-growing-projects',
+  '/blog/governed-workflow-automation-for-web3-teams',
+  '/blog/common-workflow-automation-mistakes',
+  '/blog/community-operations-for-web3-projects',
+  '/blog/technical-readiness-checklist-for-web3-projects',
+  '/blog/retention-through-community-operations',
+];
 
 function buildSitemapXml(entries) {
   const urls = entries

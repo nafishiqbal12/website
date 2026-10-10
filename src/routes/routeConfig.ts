@@ -7,7 +7,7 @@ export const TARGET_KEYWORDS = [
   'managed devops and ai operations',
 ].join(', ');
 
-export type StaticPage = 'home' | 'build' | 'automate' | 'operate' | 'grow' | 'docs' | 'pricing';
+export type StaticPage = 'home' | 'build' | 'automate' | 'operate' | 'grow' | 'docs' | 'pricing' | 'contact';
 
 export type DynamicPage =
   | 'cases'
@@ -39,6 +39,7 @@ export const PATH_BY_PAGE: Record<StaticPage, string> = {
   grow: '/grow',
   docs: '/docs',
   pricing: '/pricing',
+  contact: '/contact',
 };
 
 export const TAG_ROUTE_PREFIX = '/blog/tag/';
@@ -131,7 +132,7 @@ export function getRouteFromPath(pathname: string): RouteState {
     }
   }
 
-  if (normalized === '/docs' || normalized === '/docs/services' || normalized === '/docs/lifecycle' || normalized.startsWith('/docs/services/')) {
+  if (normalized === '/docs' || normalized.startsWith('/docs/')) {
     return { page: 'docs', path: normalized };
   }
 
@@ -148,6 +149,8 @@ export function getRouteFromPath(pathname: string): RouteState {
       return { page: 'grow', path: '/grow' };
     case '/pricing':
       return { page: 'pricing', path: '/pricing' };
+    case '/contact':
+      return { page: 'contact', path: '/contact' };
     case '/cases':
     case '/case-studies':
       return { page: 'cases', path: '/case-studies' };

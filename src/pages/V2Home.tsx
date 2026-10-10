@@ -91,9 +91,9 @@ const LIFECYCLE_STEPS = [
 
 export default function V2Home({ onNavigate }: HomeProps) {
   const { user } = useAuth();
-  const primaryPath = user ? '/dashboard' : '/signup';
+  const primaryPath = user ? '/dashboard' : '/docs/services';
   const secondaryPath = user ? '/profile' : '/login';
-  const primaryLabel = user ? 'Open Dashboard' : 'Start Free Trial';
+  const primaryLabel = user ? 'Open Dashboard' : 'Browse Services';
   const secondaryLabel = user ? 'View Profile' : 'Log in';
 
   return (
@@ -308,7 +308,7 @@ export default function V2Home({ onNavigate }: HomeProps) {
           <Container className="bw-shell bw-grid-noise p-8 sm:p-10 text-center">
             <p className="text-sm font-semibold tracking-[0.2em] uppercase text-cyan-200">Start with a suitable engagement</p>
             <h2 className="mt-3 text-3xl font-semibold text-slate-100 sm:text-4xl">Ready to build, automate, and operate your Web3 project?</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-slate-300">Start with BlockWaveLab&apos;s 3-day free trial.</p>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-300">Review the documented services and decide which engagement needs further scoping.</p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Button onClick={() => onNavigate(primaryPath)}>{primaryLabel}</Button>
               <Button variant="secondary" onClick={() => onNavigate(secondaryPath)}>{secondaryLabel}</Button>

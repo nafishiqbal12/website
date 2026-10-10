@@ -69,7 +69,7 @@ function AuthBrandPanel() {
         <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-200"><Sparkles size={16} aria-hidden="true" /> Web3 delivery workspace</p>
         <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-50 sm:text-5xl">Start building with BlockWaveLab.</h2>
         <p className="mt-5 max-w-lg text-lg leading-8 text-slate-300">AI Automation &amp; DevOps Partner for Web3 Projects.</p>
-        <p className="mt-3 max-w-lg text-slate-400">Start your 3-day free trial and explore the platform.</p>
+        <p className="mt-3 max-w-lg text-slate-400">Create an account to access the BlockWaveLab platform when the required environment is configured.</p>
       </div>
       <div className="mt-16 grid max-w-xl gap-3 sm:grid-cols-3 lg:mt-24">
         <div className="rounded-xl border border-slate-700/80 bg-slate-950/30 p-4"><CloudCog size={18} className="text-cyan-300" aria-hidden="true" /><p className="mt-3 text-xs font-semibold tracking-[0.16em] text-slate-300">BUILD</p></div>
@@ -132,7 +132,7 @@ export function LoginPage({ onNavigate }: AuthPageProps) {
       </form>
       <div className="mt-5 flex flex-wrap gap-4 text-sm">
         <button className="bw-focus rounded text-cyan-300 hover:text-cyan-200" onClick={() => onNavigate('/forgot-password')}>Forgot password?</button>
-        <span className="text-slate-400">New to BlockWaveLab? <button className="bw-focus rounded text-cyan-300 hover:text-cyan-200" onClick={() => onNavigate('/signup')}>Start your 3-day free trial</button></span>
+        <span className="text-slate-400">New to BlockWaveLab? <button className="bw-focus rounded text-cyan-300 hover:text-cyan-200" onClick={() => onNavigate('/signup')}>Create an account</button></span>
       </div>
     </AuthFrame>
   );
@@ -168,7 +168,7 @@ export function SignupPage({ onNavigate }: AuthPageProps) {
   };
 
   return (
-    <AuthFrame title="Create your BlockWaveLab account" description="Start your 3-day free trial and explore the platform.">
+    <AuthFrame title="Create your BlockWaveLab account" description="Create an account to access the BlockWaveLab platform when the required environment is configured.">
       {!isConfigured ? <ConfigurationNotice /> : null}
       {success ? (
         <Alert title="Check your email" tone="success">If email verification is enabled, follow the provider link before signing in.</Alert>
@@ -182,7 +182,7 @@ export function SignupPage({ onNavigate }: AuthPageProps) {
           <TextField label="Password" type="password" autoComplete="new-password" hint="Use at least 8 characters." value={password} onChange={(event) => setPassword(event.target.value)} />
           <TextField label="Confirm Password" type="password" autoComplete="new-password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />
           <AuthError message={error} />
-          <Button type="submit" full disabled={isSubmitting || !isConfigured}>{isSubmitting ? 'Creating account…' : 'Start Free Trial'}</Button>
+          <Button type="submit" full disabled={isSubmitting || !isConfigured}>{isSubmitting ? 'Creating account…' : 'Create Account'}</Button>
         </form>
       )}
       <p className="mt-5 text-sm text-slate-400">Already have an account? <button className="bw-focus rounded text-cyan-300 hover:text-cyan-200" onClick={() => onNavigate('/login')}>Log in</button></p>

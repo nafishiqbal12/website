@@ -90,7 +90,7 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
               <Button onClick={() => handleNavigate('/dashboard')} size="sm">Dashboard</Button>
             </> : <>
               <Button variant="outline" onClick={() => handleNavigate('/login')} size="sm">Log in</Button>
-              <Button onClick={() => handleNavigate('/signup')} size="sm">Start Free Trial</Button>
+              <Button onClick={() => handleNavigate(currentPage === 'docs' ? '/docs/services' : '/signup')} size="sm">{currentPage === 'docs' ? 'Browse Services' : 'Create Account'}</Button>
             </>}
           </div>
 
@@ -126,7 +126,7 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
               <Button full onClick={() => handleNavigate('/dashboard')}>Dashboard</Button>
             </> : <>
               <Button full variant="outline" onClick={() => handleNavigate('/login')}>Log in</Button>
-              <Button full onClick={() => handleNavigate('/signup')}>Start Free Trial</Button>
+              <Button full onClick={() => handleNavigate(currentPage === 'docs' ? '/docs/services' : '/signup')}>{currentPage === 'docs' ? 'Browse Services' : 'Create Account'}</Button>
             </>}
           </Container>
         </div>
